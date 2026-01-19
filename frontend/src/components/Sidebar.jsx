@@ -1,4 +1,9 @@
+import { getSession, clearSession } from "../utils/auth";
+
 function Sidebar({ setTab, active }) {
+  const user = getSession();
+  const initial = user?.email?.[0]?.toUpperCase();
+
   return (
     <aside style={styles.sidebar}>
       <div>
@@ -39,12 +44,20 @@ function Sidebar({ setTab, active }) {
         </nav>
       </div>
 
-      <button
-        style={styles.logout}
-        onClick={() => window.location.href = "/"}
-      >
-        Logout
-      </button>
+      {/* Profile + Logout row */}
+      <div style={styles.profileRow}>
+        {initial && <div style={styles.avatar}>{initial}</div>}
+
+        <button
+          style={styles.logout}
+          onClick={() => {
+            clearSession();
+            window.location.href = "/";
+          }}
+        >
+          Logout
+        </button>
+      </div>
     </aside>
   );
 }
@@ -53,22 +66,25 @@ const styles = {
   sidebar: {
     width: "260px",
     backgroundColor: "var(--bg-sidebar)",
-    padding: "2.5rem 2rem",
+    padding: "2rem",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
   },
+
   logo: {
     fontFamily: "var(--font-heading)",
     fontSize: "2rem",
     cursor: "pointer",
   },
+
   nav: {
+    marginTop: "2rem",
     display: "flex",
     flexDirection: "column",
     gap: "0.75rem",
-    marginTop: "2rem",
   },
+
   navButton: {
     backgroundColor: "var(--accent-soft)",
     border: "none",
@@ -78,17 +94,40 @@ const styles = {
     cursor: "pointer",
     transition: "all 0.25s ease",
   },
+
   active: {
     backgroundColor: "var(--accent-strong)",
     color: "#fff",
     transform: "scale(1.02)",
   },
+
+  profileRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+  },
+
+  avatar: {
+    width: "36px",
+    height: "36px",
+    borderRadius: "50%",
+    backgroundColor: "var(--accent-main)",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: 600,
+    fontSize: "0.9rem",
+    flexShrink: 0,
+  },
+
   logout: {
+    flex: 1,
+    padding: "0.6rem",
+    borderRadius: "12px",
     border: "1px solid var(--border-dark)",
     background: "transparent",
     color: "var(--text-secondary)",
-    padding: "0.6rem",
-    borderRadius: "12px",
     cursor: "pointer",
   },
 };

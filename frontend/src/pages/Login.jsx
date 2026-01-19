@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authenticate, setSession } from "../utils/auth";
 
 function Login() {
   const navigate = useNavigate();
@@ -8,37 +9,38 @@ function Login() {
   const [show, setShow] = useState(false);
 
   const handleLogin = () => {
-    const saved = JSON.parse(localStorage.getItem("syloraUser"));
-    if (saved && saved.email === email && saved.password === password) {
-      navigate("/home");
-    } else {
-      alert("Invalid credentials");
+    const user = authenticate(email, password);
+    if (!user) {
+      alert("Invalid email or password");
+      return;
     }
+    setSession(user);
+    navigate("/home");
   };
 
   return (
     <section style={styles.page} className="fade-in">
       <div style={styles.card}>
+        {/* FIX 1: Dark logo restored */}
         <h1 style={styles.logo}>SyLora</h1>
-        <p style={styles.text}>Log in to continue</p>
 
         <input
-          style={styles.input}
           type="email"
           placeholder="Email"
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          style={styles.input}
         />
 
         <div style={styles.passwordWrapper}>
           <input
-            style={styles.passwordInput}
             type={show ? "text" : "password"}
             placeholder="Password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            style={styles.input}
           />
           <button
             style={styles.eye}
@@ -53,6 +55,7 @@ function Login() {
           Login
         </button>
 
+        {/* FIX 2: Signup option restored */}
         <p style={styles.link} onClick={() => navigate("/signup")}>
           Don’t have an account? Sign up
         </p>
@@ -78,10 +81,7 @@ const styles = {
   logo: {
     fontFamily: "var(--font-heading)",
     fontSize: "2.8rem",
-    color: "var(--text-dark)",
-  },
-  text: {
-    color: "#6f6a64",
+    color: "var(--text-dark)", // explicitly dark
     marginBottom: "2rem",
   },
   input: {
@@ -94,12 +94,6 @@ const styles = {
   passwordWrapper: {
     position: "relative",
     marginBottom: "1rem",
-  },
-  passwordInput: {
-    width: "100%",
-    padding: "0.8rem",
-    borderRadius: "12px",
-    border: "1px solid var(--border-light)",
   },
   eye: {
     position: "absolute",
