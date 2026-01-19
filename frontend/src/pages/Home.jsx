@@ -1,27 +1,22 @@
+import { useState } from "react";
 import Sidebar from "../components/Sidebar";
-import UploadHero from "../components/UploadHero";
+import LandingHero from "../components/LandingHero";
+import SyllabusVisualizer from "../components/SyllabusVisualizer";
+import TodoList from "../components/TodoList";
 
 function Home() {
+  const [tab, setTab] = useState("home");
+
   return (
-    <div style={styles.layout}>
-      <Sidebar />
-      <main style={styles.main} className="slide-up">
-        <UploadHero />
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <Sidebar setTab={setTab} active={tab} />
+      <main style={{ flex: 1, padding: "3rem" }}>
+        {tab === "home" && <LandingHero />}
+        {tab === "syllabus" && <SyllabusVisualizer />}
+        {tab === "todo" && <TodoList />}
       </main>
     </div>
   );
 }
-
-const styles = {
-  layout: {
-    display: "flex",
-    minHeight: "100vh",
-  },
-
-  main: {
-    flex: 1,
-    padding: "3rem",
-  },
-};
 
 export default Home;
