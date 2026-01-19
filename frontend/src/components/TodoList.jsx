@@ -1,75 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getSession, getUserTodos, updateTodos } from "../utils/auth";
 
 function TodoList() {
+  const user = getSession();
   const [todos, setTodos] = useState([]);
+  const [text, setText] = useState("");
 
-  const completed = todos.filter(t => t.done).length;
-  const total = todos.length;
-  const percent = total === 0 ? 0 : (completed / total) * 100;
-  const angle = (percent / 100) * 360;
+  useEffect(() => {
+    if (user?.email) {
+      setTodos(getUserTodos(user.email));
+    }
+  }, [user]);
 
   const addTask = () => {
-    setTodos([...todos, { text: "", done: false }]);
+    if (!text.trim()) return;
+    const updated = [...todos, { id: Date.now(), text, done: false }];
+    setTodos(updated);
+    updateTodos(user.email, updated);
+    setText("");
   };
 
-  const update = (i, key, value) => {
-    const copy = [...todos];
-    copy[i] = { ...copy[i], [key]: value };
-    setTodos(copy);
+  const toggle = (id) => {
+    const updated = todos.map((t) =>
+      t.id === id ? { ...t, done: !t.done } : t
+    );
+    setTodos(updated);
+    updateTodos(user.email, updated);
   };
 
   return (
-    <section className="fade-in">
+    <section>
       <h2 style={styles.heading}>My To-Dos</h2>
 
-      <button style={styles.add} onClick={addTask}>
-        + Add Task
-      </button>
+      <div style={styles.addBox}>
+        <input
+          style={styles.input}
+          placeholder="Add a task"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button style={styles.button} onClick={addTask}>
+          Add
+        </button>
+      </div>
 
-      {todos.map((t, i) => (
-        <div key={i} style={styles.row}>
+      {todos.map((t) => (
+        <div key={t.id} style={styles.row}>
           <input
             type="checkbox"
             checked={t.done}
-            onChange={(e) => update(i, "done", e.target.checked)}
+            onChange={() => toggle(t.id)}
           />
-          <input
+          <span
             style={{
-              ...styles.input,
               textDecoration: t.done ? "line-through" : "none",
             }}
-            placeholder="Write your task…"
-            value={t.text}
-            onChange={(e) => update(i, "text", e.target.value)}
-          />
+          >
+            {t.text}
+          </span>
         </div>
       ))}
-
-      {total > 0 && (
-        <>
-          <div style={styles.pieWrapper}>
-            <div
-              style={{
-                ...styles.pie,
-                background: `conic-gradient(
-                  var(--accent-strong) ${angle}deg,
-                  var(--accent-soft) 0deg
-                )`,
-              }}
-            />
-          </div>
-
-          <p style={styles.label}>
-            {completed} of {total} tasks completed
-          </p>
-        </>
-      )}
-
-      {total > 0 && completed === total && (
-        <p style={styles.congrats}>
-          🎉 You’ve completed everything. Well done.
-        </p>
-      )}
     </section>
   );
 }
@@ -77,49 +67,33 @@ function TodoList() {
 const styles = {
   heading: {
     fontFamily: "var(--font-heading)",
-    fontSize: "2.5rem",
+    fontSize: "2.4rem",
     marginBottom: "1rem",
   },
-  add: {
+  addBox: {
+    display: "flex",
+    gap: "1rem",
     marginBottom: "1.5rem",
-    padding: "0.5rem 1.25rem",
+  },
+  input: {
+    flex: 1,
+    padding: "0.8rem",
+    borderRadius: "12px",
+    border: "1px solid var(--border-light)",
+  },
+  button: {
+    padding: "0.8rem 1.5rem",
     borderRadius: "999px",
     border: "none",
-    backgroundColor: "var(--accent-main)",
+    backgroundColor: "var(--accent-strong)",
     color: "#fff",
     cursor: "pointer",
   },
   row: {
     display: "flex",
-    gap: "1rem",
-    marginBottom: "1rem",
-  },
-  input: {
-    flex: 1,
-    padding: "0.6rem",
-    borderRadius: "10px",
-    border: "1px solid var(--border-light)",
-  },
-  pieWrapper: {
-    marginTop: "2rem",
-    display: "flex",
-    justifyContent: "center",
-  },
-  pie: {
-    width: "120px",
-    height: "120px",
-    borderRadius: "50%",
-    transition: "all 0.6s ease",
-  },
-  label: {
-    textAlign: "center",
-    marginTop: "1rem",
-    color: "var(--text-secondary)",
-  },
-  congrats: {
-    textAlign: "center",
-    marginTop: "1.5rem",
-    fontWeight: 500,
+    alignItems: "center",
+    gap: "0.75rem",
+    marginBottom: "0.75rem",
   },
 };
 
