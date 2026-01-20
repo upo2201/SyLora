@@ -41,18 +41,28 @@ function Sidebar({ setTab, active }) {
             onClick={() => setTab(item.id)}
             style={{
               ...styles.navItem,
-              background: active === item.id ? "rgba(255,255,255,0.15)" : "transparent",
-              borderLeft: active === item.id ? "4px solid #d4a373" : "4px solid transparent",
+              background: active === item.id ? "#d4a373" : "transparent",
+              color: active === item.id ? "#fff" : "var(--text-sidebar)",
+              fontWeight: active === item.id ? "bold" : "normal",
+              paddingLeft: active === item.id ? "1.2rem" : "1rem", // Subtle shift
+              boxShadow: active === item.id ? "0 4px 12px rgba(212, 163, 115, 0.3)" : "none",
             }}
           >
             <span style={styles.icon}>{item.icon}</span>
             {item.label}
           </button>
         ))}
+        {/* Spacer to push profile section down and keep distance from menu */}
+        <div style={{ flex: 1, minHeight: '2rem' }}></div>
       </nav>
 
       <div
-        style={{ ...styles.profileSection, cursor: 'pointer', border: active === 'profile' ? '1px solid #d4a373' : '1px solid transparent' }}
+        style={{
+          ...styles.profileSection,
+          cursor: 'pointer',
+          border: active === 'profile' ? '1px solid #d4a373' : '1px solid transparent',
+          background: active === 'profile' ? 'rgba(212, 163, 115, 0.1)' : 'rgba(255,255,255,0.05)'
+        }}
         onClick={() => setTab("profile")}
       >
         <div style={styles.profileIcon}><FaUserCircle /></div>
@@ -80,7 +90,8 @@ const styles = {
     boxShadow: "2px 0 10px rgba(0,0,0,0.1)",
     position: 'sticky',
     top: 0,
-    height: '100vh'
+    height: '100vh',
+    overflowY: 'auto' // Fixes the "can't see logout" issue if height is small
   },
   logo: {
     display: "flex",
@@ -95,9 +106,9 @@ const styles = {
     gap: '0.8rem',
     padding: '1rem',
     marginBottom: '1rem',
-    background: 'rgba(255,255,255,0.05)',
+    marginTop: 'auto', // Pushes to bottom, but spacer above adds extra gap
     borderRadius: '12px',
-    marginTop: 'auto'
+    transition: 'all 0.2s'
   },
   profileIcon: {
     fontSize: '2rem',
@@ -110,8 +121,9 @@ const styles = {
   nav: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.5rem",
-    flex: 1
+    gap: "0.8rem", // Increased gap between buttons
+    flex: 1,
+    marginBottom: '1rem'
   },
   navItem: {
     display: "flex",
@@ -121,12 +133,13 @@ const styles = {
     color: "var(--text-sidebar)",
     textDecoration: "none",
     fontSize: "1rem",
-    borderRadius: "0 10px 10px 0",
+    borderRadius: "12px",
     transition: "all 0.2s",
     cursor: "pointer",
     border: 'none',
     textAlign: 'left',
-    outline: 'none'
+    outline: 'none',
+    width: '100%'
   },
   icon: {
     fontSize: "1.2rem"
@@ -143,7 +156,7 @@ const styles = {
     cursor: "pointer",
     fontSize: "1rem",
     fontWeight: "bold",
-    marginTop: "1rem"
+    marginTop: "0.5rem"
   }
 };
 

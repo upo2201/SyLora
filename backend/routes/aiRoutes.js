@@ -54,8 +54,10 @@ router.post('/chat', protect, async (req, res) => {
 
     context += `\nStudent's Question: ${message}\n\nAnswer concisely and helpfully.`;
 
-    // FIX: Using standardized gemini-1.5-flash
+    // STRICTLY use gemini-1.5-flash. gemini-pro is deprecated/unavailable for this key type.
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    console.log("AI Chat: Generating content with gemini-1.5-flash...");
     const result = await model.generateContent(context);
     const response = await result.response;
     const text = response.text();
@@ -63,7 +65,7 @@ router.post('/chat', protect, async (req, res) => {
     res.json({ reply: text });
 
   } catch (error) {
-    console.error("AI CHAT ERROR DETAILS:", error); // Verbose logging
+    console.error("AI CHAT ERROR DETAILS:", error);
     res.status(500).json({ message: "Failed to generate response", error: error.message });
   }
 });
@@ -75,12 +77,14 @@ router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
       return res.status(400).json({ message: "No PDF file uploaded" });
     }
 
+    console.log("PDF Upload received. Size:", req.file.size);
+
     // Use buffer directly from memory storage
     const dataBuffer = req.file.buffer;
     const pdfData = await pdfParse(dataBuffer);
     const text = pdfData.text;
 
-    // No need to cleanup temp file with memory storage
+    console.log("PDF parsed. Text length:", text.length);
 
     // Prompt Gemini to structure the data
     const prompt = `
@@ -101,17 +105,22 @@ router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
         ${text.substring(0, 30000)} // Limit context if needed
         `;
 
+    // STRICTLY use gemini-1.5-flash
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
+
+    console.log("AI PDF: Generating structure with gemini-1.5-flash...");
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const jsonText = response.text();
+
+    console.log("AI PDF: Response received.");
 
     const structuredData = JSON.parse(jsonText);
 
     res.json(structuredData);
 
   } catch (error) {
-    console.error("PDF PARSE ERROR DETAILS:", error); // Verbose logging
+    console.error("PDF PARSE ERROR DETAILS:", error);
     res.status(500).json({ message: "Failed to parse PDF", error: error.message });
   }
 });
