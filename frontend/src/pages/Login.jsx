@@ -1,124 +1,179 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { authenticate, setSession } from "../utils/auth";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../utils/api";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-function Login() {
-  const navigate = useNavigate();
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [show, setShow] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    const user = authenticate(email, password);
-    if (!user) {
-      alert("Invalid email or password");
-      return;
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) navigate("/home");
+  }, [navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(email, password);
+      navigate("/home");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
     }
-    setSession(user);
-    navigate("/home");
   };
 
   return (
-    <section style={styles.page} className="fade-in">
+    <div style={styles.container} className="fade-in">
       <div style={styles.card}>
-        {/* FIX 1: Dark logo restored */}
-        <h1 style={styles.logo}>SyLora</h1>
+        <h2 style={styles.heading}>Welcome Back</h2>
 
-        <input
-          type="email"
-          placeholder="Email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={styles.input}
-        />
+        {error && <div style={{ color: 'red', marginBottom: '1rem', background: 'rgba(255,0,0,0.1)', padding: '0.5rem', borderRadius: '4px' }}>{error}</div>}
 
-        <div style={styles.passwordWrapper}>
-          <input
-            type={show ? "text" : "password"}
-            placeholder="Password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
-          />
-          <button
-            style={styles.eye}
-            onClick={() => setShow(!show)}
-            aria-label="Toggle password visibility"
-          >
-            {show ? "🙈" : "👁️"}
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.group}>
+            <label style={styles.label}>Email</label>
+            <input
+              type="email"
+              style={styles.input}
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div style={styles.group}>
+            <label style={styles.label}>Password</label>
+            <div style={styles.passwordWrapper}>
+              <input
+                type={showPassword ? "text" : "password"}
+                style={styles.inputPassword}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                style={styles.eyeBtn}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" style={styles.button}>
+            Sign In
           </button>
-        </div>
+        </form>
 
-        <button style={styles.button} onClick={handleLogin}>
-          Login
-        </button>
-
-        {/* FIX 2: Signup option restored */}
-        <p style={styles.link} onClick={() => navigate("/signup")}>
-          Don’t have an account? Sign up
+        <p style={styles.footerLink}>
+          Don't have an account?{" "}
+          <Link to="/signup" style={styles.link}>
+            Sign up
+          </Link>
         </p>
       </div>
-    </section>
+    </div>
   );
-}
+};
 
 const styles = {
-  page: {
+  container: {
     minHeight: "100vh",
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "var(--bg-page)",
   },
   card: {
-    backgroundColor: "var(--bg-surface)",
-    padding: "3rem",
-    borderRadius: "28px",
-    width: "360px",
-    textAlign: "center",
+    background: "var(--bg-surface)",
+    padding: "2.5rem",
+    borderRadius: "20px",
+    width: "100%",
+    maxWidth: "400px",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+    color: "#1e1e1e"
   },
-  logo: {
-    fontFamily: "var(--font-heading)",
-    fontSize: "2.8rem",
-    color: "var(--text-dark)", // explicitly dark
+  heading: {
+    textAlign: "center",
     marginBottom: "2rem",
+    fontFamily: "var(--font-heading)",
+    fontSize: "2rem",
+    color: "#1e1e1e"
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1.5rem"
+  },
+  group: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem"
+  },
+  label: {
+    fontSize: "0.9rem",
+    color: "#555",
+    fontWeight: "500"
   },
   input: {
-    width: "100%",
     padding: "0.8rem",
-    borderRadius: "12px",
-    border: "1px solid var(--border-light)",
-    marginBottom: "1rem",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    fontSize: "1rem",
+    outline: "none",
+    width: '100%'
   },
-  passwordWrapper: {
-    position: "relative",
-    marginBottom: "1rem",
+  passwordWrapper: { // New wrapper for input + eye
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center'
   },
-  eye: {
-    position: "absolute",
-    right: "12px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    border: "none",
-    background: "none",
-    cursor: "pointer",
+  inputPassword: {
+    padding: "0.8rem",
+    paddingRight: "2.5rem", // make space for eye
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    fontSize: "1rem",
+    outline: "none",
+    width: '100%'
+  },
+  eyeBtn: {
+    position: 'absolute',
+    right: '0.8rem',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#666',
+    display: 'flex',
+    alignItems: 'center'
   },
   button: {
-    width: "100%",
     padding: "0.9rem",
-    borderRadius: "999px",
+    borderRadius: "8px",
     border: "none",
     backgroundColor: "var(--accent-strong)",
-    color: "#fff",
+    color: "white",
+    fontSize: "1rem",
+    fontWeight: "bold",
     cursor: "pointer",
+    marginTop: "1rem"
+  },
+  footerLink: {
+    marginTop: "1.5rem",
+    textAlign: "center",
+    fontSize: "0.9rem",
+    color: "#666"
   },
   link: {
-    marginTop: "1rem",
-    fontSize: "0.85rem",
-    cursor: "pointer",
-    color: "#7a6f65",
-  },
-};
+    color: "var(--accent-strong)",
+    textDecoration: "none",
+    fontWeight: "600"
+  }
+}
 
 export default Login;

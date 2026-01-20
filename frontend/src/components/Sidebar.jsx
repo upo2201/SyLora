@@ -1,8 +1,13 @@
-import { getSession, clearSession } from "../utils/auth";
+import { logout } from "../utils/api";
 
 function Sidebar({ setTab, active }) {
-  const user = getSession();
-  const initial = user?.email?.[0]?.toUpperCase();
+  const user = JSON.parse(localStorage.getItem("user"));
+  const initial = user?.name?.[0]?.toUpperCase() || "U";
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = "/";
+  };
 
   return (
     <aside style={styles.sidebar}>
@@ -41,6 +46,16 @@ function Sidebar({ setTab, active }) {
           >
             My To-Dos
           </button>
+
+          <button
+            style={{
+              ...styles.navButton,
+              ...(active === "ai" && styles.active),
+            }}
+            onClick={() => setTab("ai")}
+          >
+            AI Tutor
+          </button>
         </nav>
       </div>
 
@@ -50,10 +65,7 @@ function Sidebar({ setTab, active }) {
 
         <button
           style={styles.logout}
-          onClick={() => {
-            clearSession();
-            window.location.href = "/";
-          }}
+          onClick={handleLogout}
         >
           Logout
         </button>
@@ -93,6 +105,8 @@ const styles = {
     textAlign: "left",
     cursor: "pointer",
     transition: "all 0.25s ease",
+    color: "#1e1e1e",
+    fontWeight: "500",
   },
 
   active: {
