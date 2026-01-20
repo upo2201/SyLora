@@ -370,7 +370,8 @@ const styles = {
     fontFamily: "var(--font-heading)",
     fontSize: "2.6rem",
     marginBottom: "2rem",
-    color: "#8c6f54",
+    color: "#f5f5dc", // Light Beige
+    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
   },
 
   inputCard: {

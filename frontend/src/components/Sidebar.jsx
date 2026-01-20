@@ -1,75 +1,67 @@
-import { logout } from "../utils/api";
+import { useNavigate } from "react-router-dom";
+import { FaHome, FaBook, FaCheckSquare, FaSignOutAlt, FaRobot, FaUserCircle } from "react-icons/fa";
 
 function Sidebar({ setTab, active }) {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const initial = user?.name?.[0]?.toUpperCase() || "U";
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    window.location.href = "/";
+    localStorage.removeItem("user");
+    navigate("/");
   };
+
+  const getUserName = () => {
+    try {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) return "Student";
+      const user = JSON.parse(userStr);
+      return user.name || "Student";
+    } catch (e) {
+      return "Student";
+    }
+  };
+
+  const navItems = [
+    { id: "home", icon: <FaHome />, label: "Dashboard" },
+    { id: "syllabus", icon: <FaBook />, label: "My Syllabus" },
+    { id: "todo", icon: <FaCheckSquare />, label: "To-Do List" },
+    { id: "ai", icon: <FaRobot />, label: "AI Tutor" }
+  ];
 
   return (
     <aside style={styles.sidebar}>
-      <div>
-        <h2 style={styles.logo} onClick={() => setTab("home")}>
-          SyLora
-        </h2>
-
-        <nav style={styles.nav}>
-          <button
-            style={{
-              ...styles.navButton,
-              ...(active === "home" && styles.active),
-            }}
-            onClick={() => setTab("home")}
-          >
-            Home
-          </button>
-
-          <button
-            style={{
-              ...styles.navButton,
-              ...(active === "syllabus" && styles.active),
-            }}
-            onClick={() => setTab("syllabus")}
-          >
-            Syllabus Visualizer
-          </button>
-
-          <button
-            style={{
-              ...styles.navButton,
-              ...(active === "todo" && styles.active),
-            }}
-            onClick={() => setTab("todo")}
-          >
-            My To-Dos
-          </button>
-
-          <button
-            style={{
-              ...styles.navButton,
-              ...(active === "ai" && styles.active),
-            }}
-            onClick={() => setTab("ai")}
-          >
-            AI Tutor
-          </button>
-        </nav>
+      <div style={styles.logo}>
+        <img src="/logo.svg" alt="SyLora" style={{ width: "40px", height: "40px" }} />
+        <span style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 'bold' }}>SyLora</span>
       </div>
 
-      {/* Profile + Logout row */}
-      <div style={styles.profileRow}>
-        {initial && <div style={styles.avatar}>{initial}</div>}
+      <nav style={styles.nav}>
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setTab(item.id)}
+            style={{
+              ...styles.navItem,
+              background: active === item.id ? "rgba(255,255,255,0.15)" : "transparent",
+              borderLeft: active === item.id ? "4px solid #d4a373" : "4px solid transparent",
+            }}
+          >
+            <span style={styles.icon}>{item.icon}</span>
+            {item.label}
+          </button>
+        ))}
+      </nav>
 
-        <button
-          style={styles.logout}
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
+      <div style={styles.profileSection}>
+        <div style={styles.profileIcon}><FaUserCircle /></div>
+        <div style={styles.profileText}>
+          <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{getUserName()}</span>
+          <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>View Profile</span>
+        </div>
       </div>
+
+      <button onClick={handleLogout} style={styles.logoutBtn}>
+        <FaSignOutAlt /> Logout
+      </button>
     </aside>
   );
 }
@@ -77,73 +69,79 @@ function Sidebar({ setTab, active }) {
 const styles = {
   sidebar: {
     width: "260px",
-    backgroundColor: "var(--bg-sidebar)",
-    padding: "2rem",
+    background: "var(--bg-sidebar)",
+    color: "var(--text-sidebar)",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
+    padding: "2rem 1rem",
+    boxShadow: "2px 0 10px rgba(0,0,0,0.1)",
+    position: 'sticky',
+    top: 0,
+    height: '100vh'
   },
-
   logo: {
-    fontFamily: "var(--font-heading)",
-    fontSize: "2rem",
-    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "1rem",
+    marginBottom: "2rem",
+    paddingLeft: "1rem"
   },
-
+  profileSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.8rem',
+    padding: '1rem',
+    marginBottom: '1rem',
+    background: 'rgba(255,255,255,0.05)',
+    borderRadius: '12px',
+    marginTop: 'auto'
+  },
+  profileIcon: {
+    fontSize: '2rem',
+    color: '#d4a373'
+  },
+  profileText: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
   nav: {
-    marginTop: "2rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.75rem",
+    gap: "0.5rem",
+    flex: 1
   },
-
-  navButton: {
-    backgroundColor: "var(--accent-soft)",
+  navItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "1rem",
+    padding: "1rem",
+    color: "var(--text-sidebar)",
+    textDecoration: "none",
+    fontSize: "1rem",
+    borderRadius: "0 10px 10px 0",
+    transition: "all 0.2s",
+    cursor: "pointer",
+    border: 'none',
+    textAlign: 'left',
+    outline: 'none'
+  },
+  icon: {
+    fontSize: "1.2rem"
+  },
+  logoutBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.8rem",
+    padding: "1rem",
+    background: "rgba(255, 0, 0, 0.1)",
+    color: "#ff6b6b",
     border: "none",
-    padding: "0.75rem 1rem",
-    borderRadius: "14px",
-    textAlign: "left",
+    borderRadius: "10px",
     cursor: "pointer",
-    transition: "all 0.25s ease",
-    color: "#1e1e1e",
-    fontWeight: "500",
-  },
-
-  active: {
-    backgroundColor: "var(--accent-strong)",
-    color: "#fff",
-    transform: "scale(1.02)",
-  },
-
-  profileRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.75rem",
-  },
-
-  avatar: {
-    width: "36px",
-    height: "36px",
-    borderRadius: "50%",
-    backgroundColor: "var(--accent-main)",
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: 600,
-    fontSize: "0.9rem",
-    flexShrink: 0,
-  },
-
-  logout: {
-    flex: 1,
-    padding: "0.6rem",
-    borderRadius: "12px",
-    border: "1px solid var(--border-dark)",
-    background: "transparent",
-    color: "var(--text-secondary)",
-    cursor: "pointer",
-  },
+    fontSize: "1rem",
+    fontWeight: "bold",
+    marginTop: "1rem"
+  }
 };
 
 export default Sidebar;

@@ -203,6 +203,8 @@ const styles = {
     fontFamily: "var(--font-heading)",
     fontSize: "2.4rem",
     marginBottom: "1rem",
+    color: "#f5f5dc", // Light Beige
+    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
   },
   subHeading: {
     fontFamily: "var(--font-heading)",

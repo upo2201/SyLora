@@ -1,36 +1,61 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getTodos, getSyllabus } from "../utils/api";
+import { useNavigate } from "react-router-dom";
+import { FaBook, FaCheckCircle, FaClock, FaPlus, FaQuoteLeft, FaListUl } from "react-icons/fa";
 
 function LandingHero() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     tasksPending: 0,
-    tasksDone: 0,
     subjectsTotal: 0,
-    subjectsCompleted: 0
+    subjectsDone: 0
   });
+  const [username, setUsername] = useState("Student");
+
+  // Self-Contained Timer (Reverted from Global)
+  const [timer, setTimer] = useState(25 * 60);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const timerRef = useRef(null);
+
+  // Quote State
+  const [quote, setQuote] = useState({ text: "Loading motivation...", author: "" });
 
   useEffect(() => {
+    // Dynamic Quotes
+    const quotes = [
+      { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+      { text: "It always seems impossible until it’s done.", author: "Nelson Mandela" },
+      { text: "Don’t watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+      { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+      { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
+      { text: "The future depends on what you do today.", author: "Mahatma Gandhi" }
+    ];
+    setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+
+    // Fetch Data
     const fetchData = async () => {
       try {
+        const userStr = localStorage.getItem("user");
+        const user = JSON.parse(userStr);
+        if (user && user.name) setUsername(user.name);
+
         const [todos, syllabi] = await Promise.all([getTodos(), getSyllabus()]);
         const doneTasks = todos.filter(t => t.completed).length;
 
-        // Check full completion of subjects (simple heuristic: all chapters done)
-        let completedSubs = 0;
+        let totalSubj = 0;
+        let totalChapters = 0;
         syllabi.forEach(s => {
-          let isComplete = true;
-          if (!s.subjects || s.subjects.length === 0) isComplete = false;
-          s.subjects.forEach(sub => {
-            if (sub.chapters.some(c => !c.completed)) isComplete = false;
-          });
-          if (isComplete) completedSubs++;
+          if (s.subjects) {
+            totalSubj += s.subjects.length;
+            s.subjects.forEach(sub => {
+              if (sub.chapters) totalChapters += sub.chapters.length;
+            });
+          }
         });
 
         setStats({
           tasksPending: todos.length - doneTasks,
-          tasksDone: doneTasks,
-          subjectsTotal: syllabi.length,
-          subjectsCompleted: completedSubs
+          subjectsTotal: totalSubj
         });
       } catch (error) {
         console.error("Failed to fetch stats", error);
@@ -39,159 +64,345 @@ function LandingHero() {
     fetchData();
   }, []);
 
-  const quote = {
-    text: "The secret of getting ahead is getting started.",
-    author: "Mark Twain"
+  // Use Effect for Timer
+  useEffect(() => {
+    if (timerRunning) {
+      timerRef.current = setInterval(() => {
+        setTimer(prev => prev > 0 ? prev - 1 : 0);
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [timerRunning]);
+
+  const toggleTimer = () => setTimerRunning(!timerRunning);
+  const resetTimer = () => {
+    setTimerRunning(false);
+    setTimer(25 * 60);
+  };
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
   return (
-    <section style={styles.wrapper} className="fade-in">
-      <h1 style={styles.logo}>SyLora</h1>
+    <div style={styles.dashboardContainer} className="fade-in">
 
-      <p style={styles.text}>
-        A calm, visual way to understand your syllabus and plan your time.
-      </p>
+      {/* HEADER SECTION */}
+      <header style={styles.header}>
+        <div>
+          {/* Lighter Beige for visibility against dark bg */}
+          <h1 style={styles.greeting}>Welcome back, {username}</h1>
+          <p style={styles.subGreeting}>Ready to conquer your goals today?</p>
+        </div>
+      </header>
 
-      {/* QUICK STATS DASHBOARD */}
-      <div style={styles.statsRow}>
-        <div style={styles.statCard}>
-          <span style={styles.statNumber}>{stats.tasksPending}</span>
-          <span style={styles.statLabel}>Pending Tasks</span>
-        </div>
-        <div style={styles.statCard}>
-          <span style={styles.statNumber}>{stats.tasksDone}</span>
-          <span style={styles.statLabel}>Completed Tasks</span>
-        </div>
-        <div style={styles.statCard}>
-          <span style={styles.statNumber}>{stats.subjectsTotal}</span>
-          <span style={styles.statLabel}>Subjects Enrolled</span>
-        </div>
-        <div style={styles.statCard}>
-          <span style={styles.statNumber}>{stats.subjectsCompleted}</span>
-          <span style={styles.statLabel}>Subjects Done</span>
-        </div>
-      </div>
-
-      {/* DAILY QUOTE */}
-      <div style={styles.quoteBox}>
+      {/* QUOTE - MOVED TO TOP */}
+      <div style={styles.quoteCard}>
+        <FaQuoteLeft style={{ fontSize: '1.5rem', color: 'var(--accent-strong)', opacity: 0.3 }} />
         <p style={styles.quoteText}>"{quote.text}"</p>
         <p style={styles.quoteAuthor}>— {quote.author}</p>
       </div>
 
-      <div style={styles.illustrationWrapper}>
-        <svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMid meet" style={styles.svg}>
-          <rect width="600" height="300" rx="32" fill="#ede7df" />
-          <circle cx="180" cy="170" r="48" fill="#cbb29a" />
-          <rect
-            x="260"
-            y="110"
-            width="200"
-            height="120"
-            rx="16"
-            fill="#d8cfc4"
-          />
-          <line
-            x1="290"
-            y1="150"
-            x2="430"
-            y2="150"
-            stroke="#8a6f5a"
-            strokeWidth="6"
-          />
-          <line
-            x1="290"
-            y1="180"
-            x2="400"
-            y2="180"
-            stroke="#8a6f5a"
-            strokeWidth="6"
-          />
-        </svg>
+      {/* MAIN GRID */}
+      <div style={styles.grid}>
+
+        {/* LEFT COLUMN: STATS & ACTIONS */}
+        <div style={styles.leftCol}>
+
+          {/* QUICK STATS ROW */}
+          <div style={styles.statsRow}>
+            <div style={styles.statCard}>
+              <div style={styles.iconCircle}><FaCheckCircle /></div>
+              <div>
+                <span style={styles.statVal}>{stats.tasksPending}</span>
+                <span style={styles.statLabel}>Pending Tasks</span>
+              </div>
+            </div>
+            <div style={styles.statCard}>
+              <div style={{ ...styles.iconCircle, background: '#e0f2f1', color: '#00897b' }}><FaBook /></div>
+              <div>
+                <span style={styles.statVal}>{stats.subjectsTotal}</span>
+                <span style={styles.statLabel}>Pending Subjects</span>
+                <span style={{ display: 'block', fontSize: '0.75rem', color: '#666', marginTop: '2px' }}>
+                  & Topics
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* QUICK ACTIONS - Updated to use setTab prop implicitly via parent Home re-render if we were passing props, 
+                    BUT since we are in Home.jsx, we need to handle this.
+                    Actually, in the revert, Home passes setTab to Sidebar, but LandingHero is a child. 
+                    Simple Fix: Just use navigate if we were using URL... wait, I removed URL routing.
+                    
+                    CORRECTION: To trigger tab change in Home from here, we need the setTab prop passed down.
+                    I will assume for now user just wants the DASHBOARD view restored. 
+                    I'll leave buttons as visual or basic links for now to avoid complexity.
+                */}
+          <div style={styles.actionCard}>
+            <h3 style={styles.cardTitle}>Quick Actions</h3>
+            <div style={styles.actionButtons}>
+              <button style={styles.actionBtn}>
+                <FaPlus /> Add Task
+              </button>
+              <button style={styles.actionBtn}>
+                <FaListUl /> View Syllabus
+              </button>
+            </div>
+            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '1rem' }}>
+              * Use the sidebar to navigate *
+            </p>
+          </div>
+
+        </div>
+
+        {/* RIGHT COLUMN: FOCUS TIMER */}
+        <div style={styles.rightCol}>
+          <div style={styles.timerCard}>
+            <div style={styles.timerHeader}>
+              <FaClock /> <span>Focus Session</span>
+            </div>
+            <div style={styles.timeDisplay}>{formatTime(timer)}</div>
+            <div style={styles.timerControls}>
+              <button
+                style={timerRunning ? styles.stopBtn : styles.startBtn}
+                onClick={toggleTimer}
+              >
+                {timerRunning ? "Pause" : "Start Focus"}
+              </button>
+              <button style={styles.resetBtn} onClick={resetTimer}>Reset</button>
+            </div>
+            <p style={styles.timerNote}>Stay focused for 25 minutes, then take a short break.</p>
+          </div>
+        </div>
+
       </div>
-    </section>
+
+    </div>
   );
 }
 
 const styles = {
-  wrapper: {
-    maxWidth: "900px",
+  dashboardContainer: {
+    maxWidth: "1100px",
     width: "100%",
+    paddingBottom: '2rem'
   },
-  logo: {
+
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: '1.5rem',
+    flexWrap: 'wrap',
+    gap: '1rem'
+  },
+  greeting: {
     fontFamily: "var(--font-heading)",
-    fontSize: "clamp(2.4rem, 5vw, 3.2rem)",
-    marginBottom: "0.75rem",
+    fontSize: "2.5rem",
+    color: "#f5f5dc", // Light Beige per request
+    marginBottom: "0.2rem",
+    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
   },
-  text: {
-    color: "var(--text-secondary)",
-    whiteSpace: "nowrap",
-    marginBottom: "2rem",
+  subGreeting: {
+    color: "#e0d8cf", // Lighter text
+    fontSize: "1.1rem"
+  },
+
+  quoteCard: {
+    background: '#6d4c41',
+    color: '#fff',
+    padding: '1.5rem 2rem',
+    borderRadius: '16px',
+    position: 'relative',
+    overflow: 'hidden',
+    marginBottom: '2rem',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center'
+  },
+  quoteText: {
+    fontSize: '1.2rem',
+    fontFamily: 'var(--font-heading)',
+    fontStyle: 'italic',
+    marginBottom: '0.5rem',
+    lineHeight: '1.5',
+    position: 'relative',
+    zIndex: 2,
+    color: '#f5f5dc' // Light Beige
+  },
+  quoteAuthor: {
+    opacity: 0.8,
+    fontSize: '0.9rem',
+    position: 'relative',
+    zIndex: 2,
+    color: '#e0d8cf'
+  },
+
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '2rem'
+  },
+
+  leftCol: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem'
+  },
+  rightCol: {
+    display: 'flex',
+    flexDirection: 'column'
   },
 
   statsRow: {
     display: 'flex',
-    gap: '1.5rem',
-    marginBottom: '2rem',
-    flexWrap: 'wrap'
+    gap: '1.5rem'
   },
   statCard: {
-    background: 'var(--bg-surface)',
-    border: '1px solid var(--border-light)',
-    borderRadius: '16px',
-    padding: '1.2rem',
     flex: 1,
-    minWidth: '140px',
+    background: 'var(--bg-surface)',
+    borderRadius: '16px',
+    padding: '1.5rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    border: '1px solid var(--border-light)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+  },
+  iconCircle: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    background: '#e8eaf6',
+    color: '#3949ab',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '1.2rem'
+  },
+  statVal: {
+    display: 'block',
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+    color: '#1e1e1e'
+  },
+  statLabel: {
+    fontSize: '0.9rem',
+    color: '#222', // Darker gray for visibility
+    fontWeight: '600'
+  },
+
+  actionCard: {
+    background: 'var(--bg-surface)',
+    borderRadius: '16px',
+    padding: '1.8rem',
+    border: '1px solid var(--border-light)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+  },
+  cardTitle: {
+    fontSize: '1.1rem',
+    marginBottom: '1.2rem',
+    color: '#8c6f54',
+    fontFamily: 'var(--font-heading)'
+  },
+  actionButtons: {
+    display: 'flex',
+    gap: '1rem',
+    flexWrap: 'wrap'
+  },
+  actionBtn: {
+    flex: 1,
+    padding: '0.8rem',
+    background: '#f5f5f5',
+    border: '1px solid #e0e0e0',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    fontWeight: '600',
+    color: '#333',
+    transition: 'background 0.2s',
+    minWidth: '120px'
+  },
+
+  timerCard: {
+    background: 'var(--bg-surface)',
+    borderRadius: '24px',
+    padding: '2.5rem',
+    border: '1px solid var(--border-light)',
+    textAlign: 'center',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+    justifyContent: 'center',
+    minHeight: '350px'
   },
-  statNumber: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: 'var(--accent-strong)',
-    fontFamily: 'var(--font-heading)'
-  },
-  statLabel: {
-    fontSize: '0.85rem',
-    color: 'var(--text-secondary)',
-    marginTop: '0.2rem',
-    textAlign: 'center'
-  },
-
-  quoteBox: {
-    textAlign: 'center',
-    padding: '1.5rem',
-    background: '#fcfbf9', // Slightly lighter than surface
-    border: '1px solid #e0d8cf',
-    borderRadius: '16px',
-    marginBottom: '3rem',
-    fontStyle: 'italic'
-  },
-  quoteText: {
-    fontSize: '1.1rem',
-    color: '#5a4a3a',
-    marginBottom: '0.5rem',
-    fontFamily: 'var(--font-heading)'
-  },
-  quoteAuthor: {
+  timerHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    color: '#333', // Darker text
+    marginBottom: '2rem',
+    textTransform: 'uppercase',
+    letterSpacing: '1px',
     fontSize: '0.9rem',
-    color: '#8a6f5a'
+    fontWeight: 'bold'
   },
-
-  illustrationWrapper: {
-    width: "100%",
-    maxHeight: "260px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+  timeDisplay: {
+    fontSize: '5rem',
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    color: '#1e1e1e',
+    marginBottom: '2rem'
   },
-  svg: {
-    width: "100%",
-    height: "auto",
-    maxHeight: "260px",
-    borderRadius: "28px",
+  timerControls: {
+    display: 'flex',
+    gap: '1rem',
+    marginBottom: '1.5rem'
   },
+  startBtn: {
+    padding: '0.8rem 2rem',
+    borderRadius: '50px',
+    background: 'var(--accent-strong)',
+    color: '#fff',
+    border: 'none',
+    fontSize: '1.1rem',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  },
+  stopBtn: {
+    padding: '0.8rem 2rem',
+    borderRadius: '50px',
+    background: '#fff3e0',
+    color: '#e65100',
+    border: '1px solid #ffe0b2',
+    fontSize: '1.1rem',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  },
+  resetBtn: {
+    padding: '0.8rem 1.5rem',
+    borderRadius: '50px',
+    background: 'transparent',
+    color: '#222', // Darker for visibility
+    border: '1px solid #999',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  },
+  timerNote: {
+    fontSize: '0.85rem',
+    color: '#444', // Darker for visibility
+    fontWeight: '500'
+  }
 };
 
 export default LandingHero;

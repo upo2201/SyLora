@@ -20,8 +20,8 @@ console.log("AI Service: API Key loaded:", process.env.GEMINI_API_KEY ? "Yes (St
 
 
 const router = express.Router();
-// Use multer for memory storage or temporary file
-const upload = multer({ dest: 'uploads/' });
+// Use multer for memory storage for robust PDF handling
+const upload = multer({ storage: multer.memoryStorage() });
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -54,7 +54,7 @@ router.post('/chat', protect, async (req, res) => {
 
     context += `\nStudent's Question: ${message}\n\nAnswer concisely and helpfully.`;
 
-    // FIX: Changed model to gemini-1.5-flash
+    // FIX: Using standardized gemini-1.5-flash
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(context);
     const response = await result.response;
@@ -63,8 +63,8 @@ router.post('/chat', protect, async (req, res) => {
     res.json({ reply: text });
 
   } catch (error) {
-    console.error("AI Error:", error);
-    res.status(500).json({ message: "Failed to generate response" });
+    console.error("AI CHAT ERROR DETAILS:", error); // Verbose logging
+    res.status(500).json({ message: "Failed to generate response", error: error.message });
   }
 });
 
@@ -75,12 +75,12 @@ router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
       return res.status(400).json({ message: "No PDF file uploaded" });
     }
 
-    const dataBuffer = fs.readFileSync(req.file.path);
+    // Use buffer directly from memory storage
+    const dataBuffer = req.file.buffer;
     const pdfData = await pdfParse(dataBuffer);
     const text = pdfData.text;
 
-    // Cleanup temp file
-    fs.unlinkSync(req.file.path);
+    // No need to cleanup temp file with memory storage
 
     // Prompt Gemini to structure the data
     const prompt = `
@@ -111,8 +111,8 @@ router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
     res.json(structuredData);
 
   } catch (error) {
-    console.error("PDF Parse Error:", error);
-    res.status(500).json({ message: "Failed to parse PDF" });
+    console.error("PDF PARSE ERROR DETAILS:", error); // Verbose logging
+    res.status(500).json({ message: "Failed to parse PDF", error: error.message });
   }
 });
 

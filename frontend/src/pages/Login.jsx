@@ -128,14 +128,14 @@ const styles = {
     outline: "none",
     width: '100%'
   },
-  passwordWrapper: { // New wrapper for input + eye
+  passwordWrapper: {
     position: 'relative',
     display: 'flex',
     alignItems: 'center'
   },
   inputPassword: {
     padding: "0.8rem",
-    paddingRight: "2.5rem", // make space for eye
+    paddingRight: "2.5rem",
     borderRadius: "8px",
     border: "1px solid #ccc",
     fontSize: "1rem",

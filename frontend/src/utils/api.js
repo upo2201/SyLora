@@ -47,50 +47,10 @@ export const getSyllabus = async () => {
 export const createSyllabus = async (syllabusData) => {
   const response = await api.post("/syllabus", syllabusData);
   return response.data;
-}
-
-export const getTodos = async () => {
-  const response = await api.get("/todos");
-  return response.data;
 };
-
-export const createTodo = async (todoData) => {
-  const response = await api.post("/todos", todoData);
-  return response.data;
-}
-
-export const updateTodo = async (id, todoData) => {
-  const response = await api.put(`/todos/${id}`, todoData);
-  return response.data;
-}
-
-export const deleteTodo = async (id) => {
-  const response = await api.delete(`/todos/${id}`);
-  return response.data;
-}
 
 export const deleteSyllabus = async (id) => {
   const response = await api.delete(`/syllabus/${id}`);
-  return response.data;
-};
-
-export const updateChapterStatus = async (syllabusId, subjectId, chapterId, completed) => {
-  const response = await api.put(`/syllabus/${syllabusId}/chapters/${subjectId}/${chapterId}`, { completed });
-  return response.data;
-};
-
-// AI
-export const chatWithAI = async (message) => {
-  const response = await api.post('/ai/chat', { message });
-  return response.data;
-};
-
-export const parsePDF = async (file) => {
-  const formData = new FormData();
-  formData.append('pdf', file);
-  const response = await api.post('/ai/parse-pdf', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  });
   return response.data;
 };
 
@@ -110,5 +70,44 @@ export const deleteChapter = async (syllabusId, subjectId, chapterId) => {
   return response.data;
 };
 
+export const updateChapterStatus = async (syllabusId, subjectId, chapterId, completed) => {
+  const response = await api.put(`/syllabus/${syllabusId}/chapters/${subjectId}/${chapterId}`, { completed });
+  return response.data;
+};
+
+export const getTodos = async () => {
+  const response = await api.get("/todos");
+  return response.data;
+};
+
+export const createTodo = async (todoData) => {
+  const response = await api.post("/todos", todoData);
+  return response.data;
+};
+
+export const updateTodo = async (id, todoData) => {
+  const response = await api.put(`/todos/${id}`, todoData);
+  return response.data;
+};
+
+export const deleteTodo = async (id) => {
+  const response = await api.delete(`/todos/${id}`);
+  return response.data;
+};
+
+// AI
+export const chatWithAI = async (message) => {
+  const response = await api.post('/ai/chat', { message });
+  return response.data;
+};
+
+export const parsePDF = async (file) => {
+  const formData = new FormData();
+  formData.append('pdf', file);
+  const response = await api.post('/ai/parse-pdf', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return response.data;
+};
 
 export default api;

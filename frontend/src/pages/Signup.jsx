@@ -19,7 +19,8 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signup(name, email, password);
+      const data = await signup(name, email, password);
+      localStorage.setItem("user", JSON.stringify(data)); // Default to persistent
       navigate("/home");
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
