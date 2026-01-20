@@ -51,7 +51,10 @@ function Sidebar({ setTab, active }) {
         ))}
       </nav>
 
-      <div style={styles.profileSection}>
+      <div
+        style={{ ...styles.profileSection, cursor: 'pointer', border: active === 'profile' ? '1px solid #d4a373' : '1px solid transparent' }}
+        onClick={() => setTab("profile")}
+      >
         <div style={styles.profileIcon}><FaUserCircle /></div>
         <div style={styles.profileText}>
           <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{getUserName()}</span>

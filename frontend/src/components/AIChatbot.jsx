@@ -32,7 +32,24 @@ function AIChatbot() {
       setMessages(prev => [...prev, botMsg]);
     } catch (error) {
       console.error("AI Chat failed", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Sorry, I'm having trouble connecting right now." }]);
+      let errorMsg = "Sorry, I'm having trouble connecting right now.";
+      if (error.response?.data?.message) {
+        errorMsg = `Error: ${error.response.data.message}`;
+      }
+      setMessages(prev => [...prev, { role: 'model', text: errorMsg }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const testConnection = async () => {
+    setLoading(true);
+    try {
+      // Send a simple ping
+      await chatWithAI("Hello, just testing the connection.");
+      alert("Connection Successful! AI is responding.");
+    } catch (e) {
+      alert(`Connection Failed: ${e.response?.data?.error || e.message}`);
     } finally {
       setLoading(false);
     }
@@ -40,7 +57,10 @@ function AIChatbot() {
 
   return (
     <section style={styles.container}>
-      <h2 style={styles.heading}>SyLora AI Tutor</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={styles.heading}>SyLora AI Tutor</h2>
+        <button onClick={testConnection} style={{ padding: '0.5rem 1rem', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', cursor: 'pointer' }}> Test AI </button>
+      </div>
 
       <div style={styles.chatWindow} ref={scrollRef}>
         {messages.map((msg, index) => (

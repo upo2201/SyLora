@@ -1,21 +1,16 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { getTodos, getSyllabus } from "../utils/api";
-import { useNavigate } from "react-router-dom";
 import { FaBook, FaCheckCircle, FaClock, FaPlus, FaQuoteLeft, FaListUl } from "react-icons/fa";
 
-function LandingHero() {
-  const navigate = useNavigate();
+function LandingHero({ setTab, timerProps }) {
   const [stats, setStats] = useState({
     tasksPending: 0,
-    subjectsTotal: 0,
-    subjectsDone: 0
+    subjectsTotal: 0
   });
   const [username, setUsername] = useState("Student");
 
-  // Self-Contained Timer (Reverted from Global)
-  const [timer, setTimer] = useState(25 * 60);
-  const [timerRunning, setTimerRunning] = useState(false);
-  const timerRef = useRef(null);
+  // Destructure global timer props
+  const { timer, timerRunning, toggleTimer, resetTimer } = timerProps;
 
   // Quote State
   const [quote, setQuote] = useState({ text: "Loading motivation...", author: "" });
@@ -36,21 +31,17 @@ function LandingHero() {
     const fetchData = async () => {
       try {
         const userStr = localStorage.getItem("user");
-        const user = JSON.parse(userStr);
-        if (user && user.name) setUsername(user.name);
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          setUsername(user.name || "Student");
+        }
 
         const [todos, syllabi] = await Promise.all([getTodos(), getSyllabus()]);
         const doneTasks = todos.filter(t => t.completed).length;
 
         let totalSubj = 0;
-        let totalChapters = 0;
         syllabi.forEach(s => {
-          if (s.subjects) {
-            totalSubj += s.subjects.length;
-            s.subjects.forEach(sub => {
-              if (sub.chapters) totalChapters += sub.chapters.length;
-            });
-          }
+          if (s.subjects) totalSubj += s.subjects.length;
         });
 
         setStats({
@@ -64,24 +55,6 @@ function LandingHero() {
     fetchData();
   }, []);
 
-  // Use Effect for Timer
-  useEffect(() => {
-    if (timerRunning) {
-      timerRef.current = setInterval(() => {
-        setTimer(prev => prev > 0 ? prev - 1 : 0);
-      }, 1000);
-    } else {
-      clearInterval(timerRef.current);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [timerRunning]);
-
-  const toggleTimer = () => setTimerRunning(!timerRunning);
-  const resetTimer = () => {
-    setTimerRunning(false);
-    setTimer(25 * 60);
-  };
-
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -94,13 +67,12 @@ function LandingHero() {
       {/* HEADER SECTION */}
       <header style={styles.header}>
         <div>
-          {/* Lighter Beige for visibility against dark bg */}
           <h1 style={styles.greeting}>Welcome back, {username}</h1>
           <p style={styles.subGreeting}>Ready to conquer your goals today?</p>
         </div>
       </header>
 
-      {/* QUOTE - MOVED TO TOP */}
+      {/* QUOTE */}
       <div style={styles.quoteCard}>
         <FaQuoteLeft style={{ fontSize: '1.5rem', color: 'var(--accent-strong)', opacity: 0.3 }} />
         <p style={styles.quoteText}>"{quote.text}"</p>
@@ -110,10 +82,10 @@ function LandingHero() {
       {/* MAIN GRID */}
       <div style={styles.grid}>
 
-        {/* LEFT COLUMN: STATS & ACTIONS */}
+        {/* LEFT COLUMN */}
         <div style={styles.leftCol}>
 
-          {/* QUICK STATS ROW */}
+          {/* QUICK STATS */}
           <div style={styles.statsRow}>
             <div style={styles.statCard}>
               <div style={styles.iconCircle}><FaCheckCircle /></div>
@@ -127,40 +99,26 @@ function LandingHero() {
               <div>
                 <span style={styles.statVal}>{stats.subjectsTotal}</span>
                 <span style={styles.statLabel}>Pending Subjects</span>
-                <span style={{ display: 'block', fontSize: '0.75rem', color: '#666', marginTop: '2px' }}>
-                  & Topics
-                </span>
               </div>
             </div>
           </div>
 
-          {/* QUICK ACTIONS - Updated to use setTab prop implicitly via parent Home re-render if we were passing props, 
-                    BUT since we are in Home.jsx, we need to handle this.
-                    Actually, in the revert, Home passes setTab to Sidebar, but LandingHero is a child. 
-                    Simple Fix: Just use navigate if we were using URL... wait, I removed URL routing.
-                    
-                    CORRECTION: To trigger tab change in Home from here, we need the setTab prop passed down.
-                    I will assume for now user just wants the DASHBOARD view restored. 
-                    I'll leave buttons as visual or basic links for now to avoid complexity.
-                */}
+          {/* QUICK ACTIONS */}
           <div style={styles.actionCard}>
             <h3 style={styles.cardTitle}>Quick Actions</h3>
             <div style={styles.actionButtons}>
-              <button style={styles.actionBtn}>
+              <button style={styles.actionBtn} onClick={() => setTab("todo")}>
                 <FaPlus /> Add Task
               </button>
-              <button style={styles.actionBtn}>
+              <button style={styles.actionBtn} onClick={() => setTab("syllabus")}>
                 <FaListUl /> View Syllabus
               </button>
             </div>
-            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '1rem' }}>
-              * Use the sidebar to navigate *
-            </p>
           </div>
 
         </div>
 
-        {/* RIGHT COLUMN: FOCUS TIMER */}
+        {/* RIGHT COLUMN: FOCUS TIMER (PROPS) */}
         <div style={styles.rightCol}>
           <div style={styles.timerCard}>
             <div style={styles.timerHeader}>
@@ -192,34 +150,25 @@ const styles = {
     width: "100%",
     paddingBottom: '2rem'
   },
-
   header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
     marginBottom: '1.5rem',
-    flexWrap: 'wrap',
-    gap: '1rem'
   },
   greeting: {
     fontFamily: "var(--font-heading)",
     fontSize: "2.5rem",
-    color: "#f5f5dc", // Light Beige per request
+    color: "#f5f5dc",
     marginBottom: "0.2rem",
     textShadow: '0 2px 4px rgba(0,0,0,0.3)'
   },
   subGreeting: {
-    color: "#e0d8cf", // Lighter text
+    color: "#e0d8cf",
     fontSize: "1.1rem"
   },
-
   quoteCard: {
     background: '#6d4c41',
     color: '#fff',
     padding: '1.5rem 2rem',
     borderRadius: '16px',
-    position: 'relative',
-    overflow: 'hidden',
     marginBottom: '2rem',
     display: 'flex',
     flexDirection: 'column',
@@ -231,25 +180,18 @@ const styles = {
     fontFamily: 'var(--font-heading)',
     fontStyle: 'italic',
     marginBottom: '0.5rem',
-    lineHeight: '1.5',
-    position: 'relative',
-    zIndex: 2,
-    color: '#f5f5dc' // Light Beige
+    color: '#f5f5dc'
   },
   quoteAuthor: {
     opacity: 0.8,
     fontSize: '0.9rem',
-    position: 'relative',
-    zIndex: 2,
     color: '#e0d8cf'
   },
-
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
     gap: '2rem'
   },
-
   leftCol: {
     display: 'flex',
     flexDirection: 'column',
@@ -259,7 +201,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column'
   },
-
   statsRow: {
     display: 'flex',
     gap: '1.5rem'
@@ -294,10 +235,9 @@ const styles = {
   },
   statLabel: {
     fontSize: '0.9rem',
-    color: '#222', // Darker gray for visibility
+    color: '#222',
     fontWeight: '600'
   },
-
   actionCard: {
     background: 'var(--bg-surface)',
     borderRadius: '16px',
@@ -332,7 +272,6 @@ const styles = {
     transition: 'background 0.2s',
     minWidth: '120px'
   },
-
   timerCard: {
     background: 'var(--bg-surface)',
     borderRadius: '24px',
@@ -349,7 +288,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    color: '#333', // Darker text
+    color: '#333',
     marginBottom: '2rem',
     textTransform: 'uppercase',
     letterSpacing: '1px',
@@ -392,7 +331,7 @@ const styles = {
     padding: '0.8rem 1.5rem',
     borderRadius: '50px',
     background: 'transparent',
-    color: '#222', // Darker for visibility
+    color: '#222',
     border: '1px solid #999',
     fontSize: '1rem',
     cursor: 'pointer',
@@ -400,7 +339,7 @@ const styles = {
   },
   timerNote: {
     fontSize: '0.85rem',
-    color: '#444', // Darker for visibility
+    color: '#444',
     fontWeight: '500'
   }
 };
