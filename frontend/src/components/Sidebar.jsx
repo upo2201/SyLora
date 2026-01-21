@@ -94,27 +94,27 @@ const styles = {
     color: "var(--text-sidebar)",
     display: "flex",
     flexDirection: "column",
-    padding: "2rem 1rem",
+    padding: "1.5rem 0.8rem", // Reduced padding
     boxShadow: "2px 0 10px rgba(0,0,0,0.1)",
     position: 'sticky',
     top: 0,
     height: '100vh',
-    overflowY: 'auto'
+    overflowY: 'hidden' // Prevent scrolling
   },
   logo: {
     display: "flex",
     alignItems: "center",
-    gap: "1rem",
-    marginBottom: "2rem",
-    paddingLeft: "1rem"
+    gap: "0.8rem",
+    marginBottom: "1.5rem", // Reduced margin
+    paddingLeft: "0.5rem"
   },
   profileSection: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.8rem',
-    padding: '1rem',
-    marginBottom: '1rem',
-    marginTop: '0.5rem',
+    gap: '0.6rem',
+    padding: '0.8rem',
+    marginBottom: '0.5rem',
+    marginTop: 'auto', // Push to bottom if space permits
     borderRadius: '12px',
     transition: 'all 0.2s',
     border: '1px solid transparent'
@@ -130,15 +130,15 @@ const styles = {
   nav: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.8rem",
+    gap: "0.4rem", // Reduced gap
     flex: 1,
-    marginBottom: '1rem'
+    marginBottom: '0.5rem'
   },
   navItem: {
     display: "flex",
     alignItems: "center",
-    gap: "1rem",
-    padding: "1rem",
+    gap: "0.8rem",
+    padding: "0.8rem", // Reduced padding
     color: "var(--text-sidebar)",
     textDecoration: "none",
     fontSize: "1rem",
@@ -165,7 +165,7 @@ const styles = {
     cursor: "pointer",
     fontSize: "1rem",
     fontWeight: "bold",
-    marginBottom: "0.5rem",
+    marginBottom: "0.3rem", // Reduced margin
     width: '100%',
     justifyContent: 'flex-start'
   },
@@ -173,7 +173,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "0.8rem",
-    padding: "1rem",
+    padding: "0.8rem", // Reduced padding
     background: "rgba(255, 0, 0, 0.1)",
     color: "#ff6b6b",
     border: "none",
