@@ -56,10 +56,10 @@ router.post('/chat', protect, async (req, res) => {
 
     context += `\nStudent's Question: ${message}\n\nAnswer concisely and helpfully.`;
 
-    // Use gemini-2.5-flash as available in API
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    // Use gemini-flash-latest (valid alias)
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
-    console.log("AI Chat: Generating content with gemini-2.5-flash...");
+    console.log("AI Chat: Generating content with gemini-flash-latest...");
     const result = await model.generateContent(context);
     const response = await result.response;
     const text = response.text();
@@ -68,6 +68,12 @@ router.post('/chat', protect, async (req, res) => {
     res.json({ reply: text });
 
   } catch (error) {
+    const errorLog = `AI CHAT ERROR: ${error.message}\nStack: ${error.stack}\n`;
+    try {
+      const fs = await import('fs');
+      fs.appendFileSync('debug_file.log', errorLog);
+    } catch (e) { }
+
     console.error("AI CHAT ERROR DETAILS:", error);
     // Extract deeper error details if available
     let errorMessage = error.message;
@@ -119,10 +125,10 @@ router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
         ${text.substring(0, 30000)} // Limit context if needed
         `;
 
-    // Use gemini-2.5-flash as available in API
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json" } });
+    // Use gemini-flash-latest (valid alias)
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest", generationConfig: { responseMimeType: "application/json" } });
 
-    console.log("AI PDF: Generating structure with gemini-2.5-flash...");
+    console.log("AI PDF: Generating structure with gemini-flash-latest...");
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const jsonText = response.text();

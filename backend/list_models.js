@@ -11,8 +11,11 @@ try {
   const data = await response.json();
 
   if (data.models) {
-    console.log("Available Models:");
-    data.models.forEach(m => console.log(`- ${m.name}`));
+    console.log("Available Models:", data.models.length);
+    import('fs').then(fs => {
+      fs.writeFileSync('models.json', JSON.stringify(data.models, null, 2));
+      console.log("Models written to models.json");
+    });
   } else {
     console.log("No models found or error:", JSON.stringify(data, null, 2));
   }
