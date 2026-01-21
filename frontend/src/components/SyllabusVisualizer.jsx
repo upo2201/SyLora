@@ -269,7 +269,7 @@ function SyllabusVisualizer() {
                                   />
                                   <span style={{
                                     textDecoration: c.completed ? 'line-through' : 'none',
-                                    color: c.completed ? '#888' : '#1e1e1e', // Darker text for visibility
+                                    color: c.completed ? 'var(--text-secondary)' : 'var(--text-primary)',
                                     opacity: c.completed ? 0.7 : 1,
                                     flex: 1,
                                     cursor: 'pointer',

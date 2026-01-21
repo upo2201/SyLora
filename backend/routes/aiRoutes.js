@@ -31,6 +31,8 @@ router.post('/chat', protect, async (req, res) => {
     const { message } = req.body;
     const user = req.user;
 
+    console.log(`AI Chat Request from user: ${user._id}`);
+
     // Fetch user's syllabus to provide context
     const syllabi = await Syllabus.find({ user: user._id });
 
@@ -54,19 +56,25 @@ router.post('/chat', protect, async (req, res) => {
 
     context += `\nStudent's Question: ${message}\n\nAnswer concisely and helpfully.`;
 
-    // STRICTLY use gemini-1.5-flash. gemini-pro is deprecated/unavailable for this key type.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Use gemini-2.5-flash as available in API
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    console.log("AI Chat: Generating content with gemini-1.5-flash...");
+    console.log("AI Chat: Generating content with gemini-2.5-flash...");
     const result = await model.generateContent(context);
     const response = await result.response;
     const text = response.text();
 
+    console.log("AI Chat: Response success.");
     res.json({ reply: text });
 
   } catch (error) {
     console.error("AI CHAT ERROR DETAILS:", error);
-    res.status(500).json({ message: "Failed to generate response", error: error.message });
+    // Extract deeper error details if available
+    let errorMessage = error.message;
+    if (error.response && error.response.promptFeedback) {
+      console.error("Prompt Feedback:", error.response.promptFeedback);
+    }
+    res.status(500).json({ message: "Failed to generate response", error: errorMessage });
   }
 });
 
@@ -74,6 +82,7 @@ router.post('/chat', protect, async (req, res) => {
 router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
   try {
     if (!req.file) {
+      console.warn("PDF Parse: No file uploaded.");
       return res.status(400).json({ message: "No PDF file uploaded" });
     }
 
@@ -81,10 +90,15 @@ router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
 
     // Use buffer directly from memory storage
     const dataBuffer = req.file.buffer;
-    const pdfData = await pdfParse(dataBuffer);
-    const text = pdfData.text;
-
-    console.log("PDF parsed. Text length:", text.length);
+    let text = "";
+    try {
+      const pdfData = await pdfParse(dataBuffer);
+      text = pdfData.text;
+      console.log("PDF parsed successfully. Text length:", text.length);
+    } catch (parseError) {
+      console.error("PDF Parsing Library Error:", parseError);
+      return res.status(500).json({ message: "Failed to read PDF file.", error: parseError.message });
+    }
 
     // Prompt Gemini to structure the data
     const prompt = `
@@ -105,22 +119,28 @@ router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
         ${text.substring(0, 30000)} // Limit context if needed
         `;
 
-    // STRICTLY use gemini-1.5-flash
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
+    // Use gemini-2.5-flash as available in API
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json" } });
 
-    console.log("AI PDF: Generating structure with gemini-1.5-flash...");
+    console.log("AI PDF: Generating structure with gemini-2.5-flash...");
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const jsonText = response.text();
 
     console.log("AI PDF: Response received.");
 
-    const structuredData = JSON.parse(jsonText);
+    let structuredData;
+    try {
+      structuredData = JSON.parse(jsonText);
+    } catch (jsonError) {
+      console.error("AI returned invalid JSON:", jsonText);
+      return res.status(500).json({ message: "AI returned invalid structure", raw: jsonText });
+    }
 
     res.json(structuredData);
 
   } catch (error) {
-    console.error("PDF PARSE ERROR DETAILS:", error);
+    console.error("PDF PARSE ROUTE ERROR:", error);
     res.status(500).json({ message: "Failed to parse PDF", error: error.message });
   }
 });
