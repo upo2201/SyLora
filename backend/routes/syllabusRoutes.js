@@ -120,6 +120,7 @@ router.put('/:id/chapters/:subjectId/:chapterId/name', protect, async (req, res)
 router.delete('/:id/chapters/:subjectId/:chapterId', protect, async (req, res) => {
   try {
     const { id, subjectId, chapterId } = req.params;
+    console.log(`Deleting chapter: ${chapterId} from subject: ${subjectId} in syllabus: ${id}`);
 
     const syllabus = await Syllabus.findOne({ _id: id, user: req.user._id });
     if (!syllabus) return res.status(404).json({ message: "Syllabus not found" });
@@ -127,11 +128,20 @@ router.delete('/:id/chapters/:subjectId/:chapterId', protect, async (req, res) =
     const subject = syllabus.subjects.id(subjectId);
     if (!subject) return res.status(404).json({ message: "Subject not found" });
 
-    subject.chapters.pull(chapterId); // Mongoose pull to remove by ID
+    // Explicitly filter out the chapter to ensure deletion works
+    const initialLength = subject.chapters.length;
+    subject.chapters = subject.chapters.filter(c => c._id.toString() !== chapterId);
+
+    if (subject.chapters.length === initialLength) {
+      console.log("Chapter not found in array or ID mismatch");
+      // We can return 404 or just save. If not found, it's effectively deleted.
+    }
+
     await syllabus.save();
 
     res.json(syllabus);
   } catch (error) {
+    console.error("Delete Chapter Error:", error);
     res.status(500).json({ message: error.message });
   }
 });

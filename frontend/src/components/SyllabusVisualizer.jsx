@@ -109,69 +109,7 @@ function SyllabusVisualizer() {
     }
   };
 
-  const toggleChapter = async (syllabusId, subjectId, chapter) => {
-    const isCompleting = !chapter.completed;
-
-    const updatedSyllabi = syllabi.map(s => {
-      if (s._id === syllabusId) {
-        const updatedSubjects = s.subjects.map(sub => {
-          if (sub._id === subjectId) {
-            const updatedChapters = sub.chapters.map(c =>
-              c._id === chapter._id ? { ...c, completed: isCompleting } : c
-            );
-            return { ...sub, chapters: updatedChapters };
-          }
-          return sub;
-        });
-        return { ...s, subjects: updatedSubjects };
-      }
-      return s;
-    });
-    setSyllabi(updatedSyllabi);
-
-    if (isCompleting) {
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ['#cbb29a', '#8c6f54', '#ffffff'] // Parchment themes
-      });
-    }
-
-    try {
-      await updateChapterStatus(syllabusId, subjectId, chapter._id, isCompleting);
-    } catch (error) {
-      console.error("Failed to update status", error);
-      fetchSyllabi();
-    }
-  };
-
-  const handleAddChapter = async (syllabusId, subjectId) => {
-    const name = prompt("Enter chapter name:");
-    if (!name) return;
-    try {
-      const updatedSyllabus = await addChapter(syllabusId, subjectId, name);
-      setSyllabi(syllabi.map(s => s._id === syllabusId ? updatedSyllabus : s));
-    } catch (error) {
-      console.error("Failed to add chapter", error);
-    }
-  };
-
-  const handleRenameClick = (sId, subId, c) => {
-    setEditingChapter({ syllabusId: sId, subjectId: subId, chapterId: c._id });
-    setEditName(c.name);
-  };
-
-  const saveRename = async () => {
-    if (!editingChapter || !editName.trim()) return;
-    try {
-      const updatedSyllabus = await renameChapter(editingChapter.syllabusId, editingChapter.subjectId, editingChapter.chapterId, editName);
-      setSyllabi(syllabi.map(s => s._id === editingChapter.syllabusId ? updatedSyllabus : s));
-      setEditingChapter(null);
-    } catch (error) {
-      console.error("Failed to rename", error);
-    }
-  };
+  // ...
 
   const handleDeleteChapter = async (sId, subId, cId) => {
     if (!window.confirm("Delete this chapter?")) return;
@@ -217,7 +155,7 @@ function SyllabusVisualizer() {
               ...styles.tab,
               borderBottom: inputType === 'manual' ? '2px solid var(--accent-strong)' : '2px solid transparent',
               fontWeight: inputType === 'manual' ? 'bold' : 'normal',
-              color: inputType === 'manual' ? '#1e1e1e' : '#666'
+              color: inputType === 'manual' ? 'var(--text-primary)' : 'var(--text-secondary)'
             }}
             onClick={() => setInputType('manual')}
           >
@@ -228,7 +166,7 @@ function SyllabusVisualizer() {
               ...styles.tab,
               borderBottom: inputType === 'pdf' ? '2px solid var(--accent-strong)' : '2px solid transparent',
               fontWeight: inputType === 'pdf' ? 'bold' : 'normal',
-              color: inputType === 'pdf' ? '#1e1e1e' : '#666'
+              color: inputType === 'pdf' ? 'var(--text-primary)' : 'var(--text-secondary)'
             }}
             onClick={() => setInputType('pdf')}
           >
@@ -370,8 +308,8 @@ const styles = {
     fontFamily: "var(--font-heading)",
     fontSize: "2.6rem",
     marginBottom: "2rem",
-    color: "#f5f5dc", // Light Beige
-    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+    color: "var(--text-primary)", // Adaptive
+    textShadow: '0 2px 4px rgba(0,0,0,0.1)'
   },
 
   inputCard: {
@@ -379,7 +317,7 @@ const styles = {
     padding: "2rem",
     borderRadius: "22px",
     marginBottom: "3rem",
-    color: "#1e1e1e",
+    color: "var(--text-primary)", // Adaptive
     border: '1px solid var(--border-light)',
     boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
   },
@@ -391,7 +329,7 @@ const styles = {
     display: 'block',
     marginBottom: '0.5rem',
     fontWeight: '600',
-    color: '#333' // Darkened
+    color: "var(--text-secondary)" // Adaptive
   },
   input: {
     width: "100%",
@@ -400,13 +338,14 @@ const styles = {
     border: "1px solid var(--border-light)",
     outline: "none",
     fontSize: '1rem',
-    color: '#1e1e1e' // Ensure dark text
+    background: "var(--bg-sidebar)", // Adaptive
+    color: "var(--text-primary)"     // Adaptive
   },
 
   tabContainer: {
     display: 'flex',
     gap: '1.5rem',
-    borderBottom: '1px solid #eee',
+    borderBottom: '1px solid var(--border-light)',
     marginBottom: '1rem'
   },
   tab: {
@@ -432,16 +371,16 @@ const styles = {
     borderRadius: "14px",
     border: "1px solid var(--border-light)",
     outline: "none",
-    background: '#fcfbf9',
-    color: '#1e1e1e', // Darkened
+    background: 'var(--bg-sidebar)', // Adaptive
+    color: 'var(--text-primary)',    // Adaptive
     fontSize: '1rem'
   },
   fileUploadBox: {
-    border: '2px dashed #ccc',
+    border: '2px dashed var(--border-dark)',
     borderRadius: '14px',
     padding: '2rem',
     textAlign: 'center',
-    background: '#fcfbf9'
+    background: 'var(--bg-sidebar)' // Adaptive
   },
 
   primaryBtn: {
@@ -480,7 +419,7 @@ const styles = {
   },
 
   subjectTitle: {
-    color: "#1e1e1e",
+    color: "var(--text-primary)", // Adaptive
     fontSize: "1.3rem",
     fontWeight: 700,
     fontFamily: 'var(--font-heading)'
@@ -495,7 +434,7 @@ const styles = {
   progressBarBg: {
     height: '8px',
     width: '100%',
-    background: '#eee',
+    background: 'var(--bg-highlight)', // Adaptive
     borderRadius: '4px',
     marginTop: '0.8rem',
     overflow: 'hidden'
@@ -509,7 +448,7 @@ const styles = {
 
   contentBox: {
     padding: "0 1.5rem 1.5rem 1.5rem",
-    borderTop: '1px solid rgba(0,0,0,0.05)',
+    borderTop: '1px solid var(--border-light)',
   },
 
   controlsRow: {
@@ -536,16 +475,17 @@ const styles = {
   },
 
   subHeader: {
-    color: '#444',
+    color: 'var(--text-secondary)', // Adaptive
     fontSize: '1.1rem',
     fontWeight: '600'
   },
 
   rawContent: {
-    background: "#f6f1ec",
+    background: "var(--bg-sidebar)", // Adaptive
     padding: "1.2rem",
     borderRadius: "16px",
-    color: "#1e1e1e",
+    color: "var(--text-primary)",    // Adaptive
+    border: "1px solid var(--border-light)"
   },
 
   chapterRow: {
@@ -553,13 +493,13 @@ const styles = {
     alignItems: 'center',
     marginBottom: '0.8rem',
     padding: '4px 0',
-    borderBottom: '1px solid rgba(0,0,0,0.03)'
+    borderBottom: '1px solid var(--border-light)'
   },
 
   actions: {
     display: 'flex',
     gap: '0.8rem',
-    opacity: 0.6,
+    opacity: 0.8,
   },
 
   iconBtn: {
@@ -577,7 +517,8 @@ const styles = {
     border: 'none',
     color: '#d9534f',
     cursor: 'pointer',
-    fontSize: '0.9rem'
+    fontSize: '0.9rem',
+    zIndex: 10 // Ensure clickable
   },
 
   editInput: {
@@ -585,7 +526,9 @@ const styles = {
     padding: '4px 8px',
     borderRadius: '4px',
     border: '1px solid var(--accent-strong)',
-    outline: 'none'
+    outline: 'none',
+    background: 'var(--bg-surface)',
+    color: 'var(--text-primary)'
   },
   okBtn: { border: 'none', background: 'none', color: 'green', cursor: 'pointer', padding: '0 5px' },
   cancelBtn: { border: 'none', background: 'none', color: '#d9534f', cursor: 'pointer', padding: '0 5px' }

@@ -112,7 +112,7 @@ function TodoList() {
                 <span
                   style={{
                     textDecoration: t.completed ? "line-through" : "none",
-                    color: t.completed ? "#888" : "#1e1e1e", // Darkened for better contrast
+                    color: t.completed ? "var(--text-secondary)" : "var(--text-primary)", // Adaptive
                     flex: 1,
                     fontWeight: 500
                   }}
@@ -203,8 +203,8 @@ const styles = {
     fontFamily: "var(--font-heading)",
     fontSize: "2.4rem",
     marginBottom: "1rem",
-    color: "#f5f5dc", // Light Beige
-    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+    color: "var(--text-primary)", // Adaptive
+    textShadow: '0 2px 4px rgba(0,0,0,0.1)'
   },
   subHeading: {
     fontFamily: "var(--font-heading)",
@@ -225,7 +225,7 @@ const styles = {
     border: "1px solid var(--border-light)",
     outline: "none",
     background: "var(--bg-surface)",
-    color: "#1e1e1e", // Dark text
+    color: "var(--text-primary)", // Adaptive
     fontSize: '1rem'
   },
   button: {

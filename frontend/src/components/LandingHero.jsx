@@ -156,16 +156,16 @@ const styles = {
   greeting: {
     fontFamily: "var(--font-heading)",
     fontSize: "2.5rem",
-    color: "#f5f5dc",
+    color: "var(--text-primary)", // Adaptive
     marginBottom: "0.2rem",
-    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+    textShadow: '0 2px 4px rgba(0,0,0,0.1)'
   },
   subGreeting: {
-    color: "#e0d8cf",
+    color: "var(--text-secondary)", // Adaptive
     fontSize: "1.1rem"
   },
   quoteCard: {
-    background: '#6d4c41',
+    background: '#6d4c41', // Restored Dark Brown
     color: '#fff',
     padding: '1.5rem 2rem',
     borderRadius: '16px',
@@ -173,19 +173,20 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    textAlign: 'center'
+    textAlign: 'center',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
   },
   quoteText: {
     fontSize: '1.2rem',
     fontFamily: 'var(--font-heading)',
     fontStyle: 'italic',
     marginBottom: '0.5rem',
-    color: '#f5f5dc'
+    color: '#f5f5dc' // Fixed Light Beige for contrast on Brown
   },
   quoteAuthor: {
     opacity: 0.8,
     fontSize: '0.9rem',
-    color: '#e0d8cf'
+    color: '#e0d8cf' // Fixed Light Grey for contrast on Brown
   },
   grid: {
     display: 'grid',
@@ -220,8 +221,8 @@ const styles = {
     width: '48px',
     height: '48px',
     borderRadius: '50%',
-    background: '#e8eaf6',
-    color: '#3949ab',
+    background: 'var(--bg-sidebar)', // Adaptive
+    color: 'var(--accent-strong)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -231,11 +232,11 @@ const styles = {
     display: 'block',
     fontSize: '1.5rem',
     fontWeight: 'bold',
-    color: '#1e1e1e'
+    color: 'var(--text-primary)'
   },
   statLabel: {
     fontSize: '0.9rem',
-    color: '#222',
+    color: 'var(--text-secondary)',
     fontWeight: '600'
   },
   actionCard: {
@@ -248,7 +249,7 @@ const styles = {
   cardTitle: {
     fontSize: '1.1rem',
     marginBottom: '1.2rem',
-    color: '#8c6f54',
+    color: 'var(--text-primary)',
     fontFamily: 'var(--font-heading)'
   },
   actionButtons: {
@@ -259,8 +260,8 @@ const styles = {
   actionBtn: {
     flex: 1,
     padding: '0.8rem',
-    background: '#f5f5f5',
-    border: '1px solid #e0e0e0',
+    background: 'var(--bg-page)',
+    border: '1px solid var(--border-light)',
     borderRadius: '10px',
     cursor: 'pointer',
     display: 'flex',
@@ -268,7 +269,7 @@ const styles = {
     justifyContent: 'center',
     gap: '0.5rem',
     fontWeight: '600',
-    color: '#333',
+    color: 'var(--text-primary)',
     transition: 'background 0.2s',
     minWidth: '120px'
   },
@@ -288,7 +289,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    color: '#333',
+    color: 'var(--text-secondary)',
     marginBottom: '2rem',
     textTransform: 'uppercase',
     letterSpacing: '1px',
@@ -299,7 +300,7 @@ const styles = {
     fontSize: '5rem',
     fontFamily: 'monospace',
     fontWeight: 'bold',
-    color: '#1e1e1e',
+    color: 'var(--text-primary)',
     marginBottom: '2rem'
   },
   timerControls: {
@@ -320,9 +321,9 @@ const styles = {
   stopBtn: {
     padding: '0.8rem 2rem',
     borderRadius: '50px',
-    background: '#fff3e0',
-    color: '#e65100',
-    border: '1px solid #ffe0b2',
+    background: 'transparent',
+    color: 'var(--accent-strong)',
+    border: '1px solid var(--accent-strong)',
     fontSize: '1.1rem',
     cursor: 'pointer',
     fontWeight: 'bold'
@@ -331,15 +332,15 @@ const styles = {
     padding: '0.8rem 1.5rem',
     borderRadius: '50px',
     background: 'transparent',
-    color: '#222',
-    border: '1px solid #999',
+    color: 'var(--text-secondary)',
+    border: '1px solid var(--border-light)',
     fontSize: '1rem',
     cursor: 'pointer',
     fontWeight: 'bold'
   },
   timerNote: {
     fontSize: '0.85rem',
-    color: '#444',
+    color: 'var(--text-secondary)',
     fontWeight: '500'
   }
 };

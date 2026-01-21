@@ -1,26 +1,76 @@
 :root {
+  /* =========================================
+     LIGHT THEME (Default / Warm Beige)
+     ========================================= */
+
+  /* BACKGROUNDS */
+  --bg-page: #ece8df;
+  /* Richer Warm Beige */
+  --bg-sidebar: #e2ddd3;
+  /* Darker Beige for Sidebar */
+  --bg-surface: #ffffff;
+  /* Pure White */
+  --bg-highlight: #d6cfc2;
+  /* Darker highlight */
+
+  /* TEXT */
+  --text-primary: #1a1a1a;
+  /* Nearly Black for High Contrast */
+  --text-secondary: #4a4a4a;
+  /* Dark Grey */
+  --text-sidebar: #2d2a26;
+  /* Sidebar Text - Dark */
+  --text-dark: #f5f5f5;
+  /* Inverted for contrast if needed */
+
+  /* ACCENTS */
+  --accent-soft: #e3d6c8;
+  --accent-main: #cbb29a;
+  --accent-strong: #b89b7f;
+
+  /* BORDERS */
+  --border-dark: #b0b0b0;
+  /* Darker border for visibility */
+  --border-light: #d8d1c8;
+
+  /* FONTS - UNIFORM */
+  --font-heading: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+/* =========================================
+   DARK THEME (Original / Toggleable)
+   ========================================= */
+[data-theme='dark'] {
   /* BACKGROUNDS */
   --bg-page: #121212;
   --bg-sidebar: #181818;
-  --bg-surface: #f4f1ec;
-  --bg-highlight: #ede7df;
+  --bg-surface: #1e1e1e;
+  /* Adjusted for better dark surface contrast, originally #f4f1ec was light */
+  --bg-highlight: #2c2c2c;
+  /* adjusted */
 
   /* TEXT */
-  --text-primary: #f5f5f5;
-  --text-secondary: #cfcfcf;
+  --text-primary: #ffffff;
+  /* Pure White for High Contrast */
+  --text-secondary: #b0b0b0;
+  /* Light Grey */
+  --text-sidebar: #cfcfcf;
+  /* Sidebar Text - Light */
   --text-dark: #1e1e1e;
 
-  /* ACCENTS (BEIGE / PARCHMENT) */
+  /* ACCENTS - Kept same or slightly adjusted if needed, but original used these */
   --accent-soft: #e3d6c8;
   --accent-main: #cbb29a;
   --accent-strong: #b89b7f;
 
   /* BORDERS */
   --border-dark: #2c2c2c;
-  --border-light: #d8d1c8;
+  --border-light: #444444;
+  /* Darker light border for dark mode */
 
-  /* FONTS */
-  --font-heading: "Playfair Display", serif;
+  /* FONTS - UNIFORM (Inherited from :root or explicitly set if different) */
+  --font-heading: "Inter", sans-serif;
   --font-body: "Inter", sans-serif;
 }
 

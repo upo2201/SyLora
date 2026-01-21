@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaBook, FaCheckSquare, FaSignOutAlt, FaRobot, FaUserCircle } from "react-icons/fa";
+import { FaHome, FaBook, FaCheckSquare, FaSignOutAlt, FaRobot, FaUserCircle, FaSun, FaMoon } from "react-icons/fa";
+import { useTheme } from "../context/ThemeContext";
 
 function Sidebar({ setTab, active }) {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -31,7 +33,7 @@ function Sidebar({ setTab, active }) {
     <aside style={styles.sidebar}>
       <div style={styles.logo}>
         <img src="/logo.svg" alt="SyLora" style={{ width: "40px", height: "40px" }} />
-        <span style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 'bold' }}>SyLora</span>
+        <span style={{ color: 'var(--text-sidebar)', fontSize: '1.5rem', fontWeight: 'bold' }}>SyLora</span>
       </div>
 
       <nav style={styles.nav}>
@@ -56,19 +58,25 @@ function Sidebar({ setTab, active }) {
         <div style={{ flex: 1, minHeight: '2rem' }}></div>
       </nav>
 
+      {/* Theme Toggle Button */}
+      <button onClick={toggleTheme} style={styles.themeToggle}>
+        {theme === 'light' ? <FaMoon /> : <FaSun />}
+        <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+      </button>
+
       <div
         style={{
           ...styles.profileSection,
           cursor: 'pointer',
           border: active === 'profile' ? '1px solid #d4a373' : '1px solid transparent',
-          background: active === 'profile' ? 'rgba(212, 163, 115, 0.1)' : 'rgba(255,255,255,0.05)'
+          background: active === 'profile' ? 'rgba(212, 163, 115, 0.1)' : 'rgba(0,0,0,0.05)'
         }}
         onClick={() => setTab("profile")}
       >
         <div style={styles.profileIcon}><FaUserCircle /></div>
         <div style={styles.profileText}>
-          <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{getUserName()}</span>
-          <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>View Profile</span>
+          <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: "var(--text-sidebar)" }}>{getUserName()}</span>
+          <span style={{ fontSize: '0.75rem', opacity: 0.7, color: "var(--text-sidebar)" }}>View Profile</span>
         </div>
       </div>
 
@@ -91,7 +99,7 @@ const styles = {
     position: 'sticky',
     top: 0,
     height: '100vh',
-    overflowY: 'auto' // Fixes the "can't see logout" issue if height is small
+    overflowY: 'auto'
   },
   logo: {
     display: "flex",
@@ -106,13 +114,14 @@ const styles = {
     gap: '0.8rem',
     padding: '1rem',
     marginBottom: '1rem',
-    marginTop: 'auto', // Pushes to bottom, but spacer above adds extra gap
+    marginTop: '0.5rem',
     borderRadius: '12px',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s',
+    border: '1px solid transparent'
   },
   profileIcon: {
     fontSize: '2rem',
-    color: '#d4a373'
+    color: 'var(--accent-strong)'
   },
   profileText: {
     display: 'flex',
@@ -121,7 +130,7 @@ const styles = {
   nav: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.8rem", // Increased gap between buttons
+    gap: "0.8rem",
     flex: 1,
     marginBottom: '1rem'
   },
@@ -143,6 +152,22 @@ const styles = {
   },
   icon: {
     fontSize: "1.2rem"
+  },
+  themeToggle: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.8rem",
+    padding: "1rem",
+    background: "transparent",
+    color: "var(--text-sidebar)",
+    border: "1px solid var(--border-light)",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontSize: "1rem",
+    fontWeight: "bold",
+    marginBottom: "0.5rem",
+    width: '100%',
+    justifyContent: 'flex-start'
   },
   logoutBtn: {
     display: "flex",

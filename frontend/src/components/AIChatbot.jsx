@@ -76,7 +76,7 @@ function AIChatbot() {
             <div style={{
               ...styles.bubble,
               background: msg.role === 'user' ? 'var(--accent-strong)' : 'var(--bg-surface)',
-              color: msg.role === 'user' ? '#fff' : '#1e1e1e',
+              color: msg.role === 'user' ? '#fff' : 'var(--text-primary)', // Adaptive
               border: msg.role === 'user' ? 'none' : '1px solid var(--border-light)'
             }}>
               {msg.role === 'model' ? (
@@ -124,12 +124,12 @@ const styles = {
     fontFamily: "var(--font-heading)",
     fontSize: "2.6rem",
     marginBottom: "1.5rem",
-    color: "#f5f5dc", // Light Beige
-    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+    color: "var(--text-primary)", // Adaptive
+    textShadow: '0 2px 4px rgba(0,0,0,0.1)'
   },
   chatWindow: {
     flex: 1,
-    background: 'rgba(255,255,255,0.03)',
+    background: 'var(--bg-surface)', // Adaptive
     border: '1px solid var(--border-light)',
     borderRadius: '20px',
     padding: '1.5rem',
@@ -175,7 +175,7 @@ const styles = {
     border: '1px solid var(--border-light)',
     outline: 'none',
     background: 'var(--bg-surface)',
-    color: '#1e1e1e',
+    color: 'var(--text-primary)', // Adaptive
     fontSize: '1rem'
   },
   sendBtn: {
