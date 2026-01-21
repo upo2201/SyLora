@@ -96,14 +96,14 @@ const styles = {
     width: "100%",
     maxWidth: "400px",
     boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-    color: "#1e1e1e"
+    color: "var(--text-primary)"
   },
   heading: {
     textAlign: "center",
     marginBottom: "2rem",
     fontFamily: "var(--font-heading)",
     fontSize: "2rem",
-    color: "#1e1e1e"
+    color: "var(--text-primary)"
   },
   form: {
     display: "flex",
@@ -117,7 +117,7 @@ const styles = {
   },
   label: {
     fontSize: "0.9rem",
-    color: "#555",
+    color: "var(--text-secondary)", // Adaptive for dark mode
     fontWeight: "500"
   },
   input: {
@@ -126,7 +126,9 @@ const styles = {
     border: "1px solid #ccc",
     fontSize: "1rem",
     outline: "none",
-    width: '100%'
+    width: '100%',
+    color: 'var(--text-primary)',
+    background: 'var(--bg-page)'
   },
   passwordWrapper: {
     position: 'relative',
@@ -140,7 +142,9 @@ const styles = {
     border: "1px solid #ccc",
     fontSize: "1rem",
     outline: "none",
-    width: '100%'
+    width: '100%',
+    color: 'var(--text-primary)',
+    background: 'var(--bg-page)'
   },
   eyeBtn: {
     position: 'absolute',
