@@ -5,7 +5,7 @@ import { FaPaperPlane, FaRobot } from "react-icons/fa";
 
 function AIChatbot() {
   const [messages, setMessages] = useState([
-    { role: 'model', text: "Hello! I am your AI Study Assistant. I can see your uploaded syllabus. How can I help you plan your studies today?" }
+    { role: 'model', text: "Hello! I am your AI Study Assistant. How can I help you plan your studies today?" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);

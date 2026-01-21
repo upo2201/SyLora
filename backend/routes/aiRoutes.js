@@ -125,10 +125,10 @@ router.post('/parse-pdf', protect, upload.single('pdf'), async (req, res) => {
         ${text.substring(0, 30000)} // Limit context if needed
         `;
 
-    // Use gemini-flash-latest (valid alias)
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest", generationConfig: { responseMimeType: "application/json" } });
+    // Use gemini-1.5-flash (known for good JSON/PDF handling)
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
 
-    console.log("AI PDF: Generating structure with gemini-flash-latest...");
+    console.log("AI PDF: Generating structure with gemini-1.5-flash...");
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const jsonText = response.text();

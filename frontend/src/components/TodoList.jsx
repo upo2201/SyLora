@@ -78,7 +78,12 @@ function TodoList() {
     { name: 'Completed', value: completedCount },
     { name: 'Pending', value: pendingCount },
   ];
-  const COLORS = ['#4a4a4a', '#cbb29a']; // Dark Gray, Parchment Gold
+  const COLORS = ['var(--border-dark)', 'var(--accent-strong)']; // Adaptive attempt, or use safe static colors like ['#888', '#d4a373']
+  // Recharts might not parse var() in Cell fill. Let's use hex that works on both.
+  // Dark mode bg is dark. Light mode bg is light.
+  // #888 (Gray) works on both. #d4a373 (Gold) works on both.
+  // Previous #4a4a4a is too dark for dark mode.
+  const SAFE_COLORS = ['#808080', '#d4a373'];
 
   return (
     <div style={styles.wrapper}>
@@ -147,12 +152,12 @@ function TodoList() {
                     stroke="none"
                   >
                     {data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={`cell-${index}`} fill={SAFE_COLORS[index % SAFE_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip
                     contentStyle={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-light)', borderRadius: '8px' }}
-                    itemStyle={{ color: 'var(--text-dark)' }}
+                    itemStyle={{ color: 'var(--text-primary)' }} // Fixed text color
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -160,12 +165,12 @@ function TodoList() {
 
             <div style={styles.legend}>
               <div style={styles.legendItem}>
-                <div style={{ ...styles.dot, background: COLORS[1] }}></div>
-                <span>Pending ({pendingCount})</span>
+                <div style={{ ...styles.dot, background: SAFE_COLORS[1] }}></div>
+                <span style={{ color: 'var(--text-primary)' }}>Pending ({pendingCount})</span>
               </div>
               <div style={styles.legendItem}>
-                <div style={{ ...styles.dot, background: COLORS[0] }}></div>
-                <span>Done ({completedCount})</span>
+                <div style={{ ...styles.dot, background: SAFE_COLORS[0] }}></div>
+                <span style={{ color: 'var(--text-primary)' }}>Done ({completedCount})</span>
               </div>
             </div>
           </div>

@@ -44,9 +44,9 @@ function Home() {
   const timerProps = { timer, timerRunning, toggleTimer, resetTimer };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <Sidebar setTab={setTab} active={tab} />
-      <main style={{ flex: 1, padding: "3rem", overflowY: "auto", height: "100vh" }}>
+      <main style={{ flex: 1, padding: "3rem", overflowY: "auto", height: "100%", position: "relative" }}>
 
         {/* Pass setTab to LandingHero for Quick Actions */}
         {tab === "home" && <LandingHero setTab={setTab} timerProps={timerProps} />}
@@ -55,6 +55,8 @@ function Home() {
         {tab === "todo" && <TodoList />}
         {tab === "ai" && <AIChatbot />}
         {tab === "profile" && <Profile />}
+        {tab === "calendar" && <div className="fade-in" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-primary)' }}><h2>Calendar</h2><p>Feature coming soon!</p></div>}
+        {tab === "analytics" && <div className="fade-in" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-primary)' }}><h2>Study Analytics</h2><p>Feature coming soon!</p></div>}
       </main>
     </div>
   );

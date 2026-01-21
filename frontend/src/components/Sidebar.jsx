@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaBook, FaCheckSquare, FaSignOutAlt, FaRobot, FaUserCircle, FaSun, FaMoon } from "react-icons/fa";
+import { FaHome, FaBook, FaCheckSquare, FaSignOutAlt, FaRobot, FaUserCircle, FaSun, FaMoon, FaCalendarAlt, FaChartLine } from "react-icons/fa";
 import { useTheme } from "../context/ThemeContext";
 
 function Sidebar({ setTab, active }) {
@@ -26,13 +26,15 @@ function Sidebar({ setTab, active }) {
     { id: "home", icon: <FaHome />, label: "Dashboard" },
     { id: "syllabus", icon: <FaBook />, label: "My Syllabus" },
     { id: "todo", icon: <FaCheckSquare />, label: "To-Do List" },
-    { id: "ai", icon: <FaRobot />, label: "AI Tutor" }
+    { id: "ai", icon: <FaRobot />, label: "AI Tutor" },
+    { id: "calendar", icon: <FaCalendarAlt />, label: "Calendar" },
+    { id: "analytics", icon: <FaChartLine />, label: "Study Analytics" }
   ];
 
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logo}>
-        <img src="/logo.svg" alt="SyLora" style={{ width: "40px", height: "40px" }} />
+        <img src="/logo.svg" alt="SyLora" style={{ width: "32px", height: "32px" }} />
         <span style={{ color: 'var(--text-sidebar)', fontSize: '1.5rem', fontWeight: 'bold' }}>SyLora</span>
       </div>
 
@@ -55,7 +57,7 @@ function Sidebar({ setTab, active }) {
           </button>
         ))}
         {/* Spacer to push profile section down and keep distance from menu */}
-        <div style={{ flex: 1, minHeight: '2rem' }}></div>
+        <div style={{ flex: 1 }}></div>
       </nav>
 
       {/* Theme Toggle Button */}
@@ -94,12 +96,14 @@ const styles = {
     color: "var(--text-sidebar)",
     display: "flex",
     flexDirection: "column",
-    padding: "1.5rem 0.8rem", // Reduced padding
+    justifyContent: "space-between",
+    padding: "1rem 0.5rem", // Further Reduced padding
     boxShadow: "2px 0 10px rgba(0,0,0,0.1)",
-    position: 'sticky',
-    top: 0,
-    height: '100vh',
-    overflowY: 'hidden' // Prevent scrolling
+    height: '100vh', // Full height
+    overflowY: "auto", // Independent scrolling
+    scrollbarWidth: 'thin', // For Firefox
+    scrollbarColor: 'var(--border-light) transparent',
+    borderRight: '1px solid var(--border-light)' // Visual separator
   },
   logo: {
     display: "flex",
@@ -130,7 +134,7 @@ const styles = {
   nav: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.4rem", // Reduced gap
+    gap: "0.2rem", // Further Reduced gap
     flex: 1,
     marginBottom: '0.5rem'
   },
@@ -138,7 +142,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "0.8rem",
-    padding: "0.8rem", // Reduced padding
+    padding: "0.6rem", // Further Reduced padding
     color: "var(--text-sidebar)",
     textDecoration: "none",
     fontSize: "1rem",

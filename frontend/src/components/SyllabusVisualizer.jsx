@@ -109,6 +109,46 @@ function SyllabusVisualizer() {
     }
   };
 
+  const handleAddChapter = async (sId, subId) => {
+    const name = prompt("Enter chapter name:");
+    if (!name) return;
+    try {
+      const updatedSyllabus = await addChapter(sId, subId, name);
+      setSyllabi(syllabi.map(s => s._id === sId ? updatedSyllabus : s));
+    } catch (error) {
+      console.error("Failed to add chapter", error);
+    }
+  };
+
+  const handleRenameClick = (sId, subId, chapter) => {
+    setEditingChapter({ syllabusId: sId, subjectId: subId, chapterId: chapter._id });
+    setEditName(chapter.name);
+  };
+
+  const saveRename = async () => {
+    if (!editName.trim()) return;
+    try {
+      const { syllabusId, subjectId, chapterId } = editingChapter;
+      const updatedSyllabus = await renameChapter(syllabusId, subjectId, chapterId, editName);
+      setSyllabi(syllabi.map(s => s._id === syllabusId ? updatedSyllabus : s));
+      setEditingChapter(null);
+    } catch (error) {
+      console.error("Failed to rename", error);
+    }
+  };
+
+  const toggleChapter = async (sId, subId, chapter) => {
+    try {
+      const updatedSyllabus = await updateChapterStatus(sId, subId, chapter._id, !chapter.completed);
+      setSyllabi(syllabi.map(s => s._id === sId ? updatedSyllabus : s));
+      if (!chapter.completed) {
+        confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 }, colors: ['#cbb29a', '#8c6f54'] });
+      }
+    } catch (error) {
+      console.error("Failed to toggle chapter", error);
+    }
+  };
+
   // ...
 
   const handleDeleteChapter = async (sId, subId, cId) => {

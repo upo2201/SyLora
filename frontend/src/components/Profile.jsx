@@ -60,7 +60,7 @@ const styles = {
   heading: {
     fontFamily: "var(--font-heading)",
     fontSize: "2.5rem",
-    color: "#f5f5dc", // Light Beige
+    color: "var(--text-primary)", // Adaptive
     marginBottom: "2rem",
     textAlign: "center"
   },
@@ -76,22 +76,22 @@ const styles = {
     alignItems: "center",
     gap: "1.5rem",
     marginBottom: "3rem",
-    borderBottom: "1px solid #eee",
+    borderBottom: "1px solid var(--border-light)",
     paddingBottom: "2rem"
   },
   avatar: {
     fontSize: "5rem",
-    color: "#d4a373",
+    color: "var(--accent-main)", // Adaptive
     display: 'flex'
   },
   name: {
     fontSize: "2rem",
     margin: 0,
-    color: "#333",
+    color: "var(--text-primary)", // Adaptive
     fontFamily: "var(--font-heading)"
   },
   role: {
-    color: "#888",
+    color: "var(--text-secondary)", // Adaptive
     fontSize: "1rem"
   },
   infoSection: {
@@ -104,7 +104,7 @@ const styles = {
     gap: "1.5rem",
     alignItems: "center",
     padding: "1rem",
-    background: "#f9f9f9",
+    background: "var(--bg-sidebar)", // Adaptive
     borderRadius: "12px"
   },
   icon: {
@@ -114,7 +114,7 @@ const styles = {
   label: {
     display: "block",
     fontSize: "0.85rem",
-    color: "#666",
+    color: "var(--text-secondary)", // Adaptive
     marginBottom: "0.2rem",
     textTransform: "uppercase",
     letterSpacing: "0.5px"
@@ -122,7 +122,7 @@ const styles = {
   value: {
     fontSize: "1.1rem",
     fontWeight: "bold",
-    color: "#333",
+    color: "var(--text-primary)", // Adaptive
     margin: 0
   }
 };
